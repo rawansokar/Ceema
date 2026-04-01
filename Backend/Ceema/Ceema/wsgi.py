@@ -14,5 +14,4 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Ceema.settings')
 
 application = get_wsgi_application()
-rawan betheb rania
-khody bosa
+
