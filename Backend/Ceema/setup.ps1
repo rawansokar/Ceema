@@ -16,15 +16,15 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-# Find psql — auto-detect if not in PATH
+# Find psql - auto-detect if not in PATH
 if (-not (Get-Command psql -ErrorAction SilentlyContinue)) {
-    $pgBin = Get-ChildItem "C:\Program Files\PostgreSQL" -ErrorAction SilentlyContinue |
+    $pgInstall = Get-ChildItem "C:\Program Files\PostgreSQL" -ErrorAction SilentlyContinue |
         Sort-Object Name -Descending |
-        Select-Object -First 1 |
-        ForEach-Object { "$($_.FullName)\bin" }
+        Select-Object -First 1
 
-    if ($pgBin -and (Test-Path "$pgBin\psql.exe")) {
-        Write-Host "PostgreSQL found at $pgBin — adding to PATH for this session." -ForegroundColor Yellow
+    if ($pgInstall) {
+        $pgBin = "$($pgInstall.FullName)\bin"
+        Write-Host "PostgreSQL found at $pgBin - adding to PATH." -ForegroundColor Yellow
         $env:PATH = "$pgBin;$env:PATH"
     } else {
         Write-Host "ERROR: PostgreSQL not found. Download from https://www.postgresql.org/download/windows/" -ForegroundColor Red
@@ -45,7 +45,9 @@ Write-Host "Installing dependencies..."
 Write-Host "Dependencies installed." -ForegroundColor Green
 
 # Set postgres password for psql commands
-if ($PostgresPass) { $env:PGPASSWORD = $PostgresPass }
+if ($PostgresPass) {
+    $env:PGPASSWORD = $PostgresPass
+}
 
 # Create DB user and database
 Write-Host "Setting up PostgreSQL..."
@@ -54,17 +56,12 @@ psql -U $PostgresUser -h $DBHost -p $DBPort -c "CREATE DATABASE $DBName OWNER $D
 psql -U $PostgresUser -h $DBHost -p $DBPort -c "GRANT ALL PRIVILEGES ON DATABASE $DBName TO $DBUser;" 2>$null
 Write-Host "Database ready." -ForegroundColor Green
 
-# Write .env
-@"
-POSTGRES_DB=$DBName
-POSTGRES_USER=$DBUser
-POSTGRES_PASSWORD=$DBPass
-POSTGRES_HOST=$DBHost
-POSTGRES_PORT=$DBPort
-"@ | Out-File -FilePath ".env" -Encoding utf8
+# Write .env file
+$envContent = "POSTGRES_DB=$DBName`nPOSTGRES_USER=$DBUser`nPOSTGRES_PASSWORD=$DBPass`nPOSTGRES_HOST=$DBHost`nPOSTGRES_PORT=$DBPort"
+$envContent | Out-File -FilePath ".env" -Encoding utf8
 Write-Host ".env created." -ForegroundColor Green
 
-# Set env vars
+# Set env vars for current session
 $env:POSTGRES_DB = $DBName
 $env:POSTGRES_USER = $DBUser
 $env:POSTGRES_PASSWORD = $DBPass
@@ -77,7 +74,7 @@ Write-Host "Running migrations..."
 
 Write-Host ""
 Write-Host "=== Setup complete! ===" -ForegroundColor Green
-Write-Host "Start the server with:" -ForegroundColor Yellow
+Write-Host "To start the server next time:" -ForegroundColor Yellow
 Write-Host "  venv\Scripts\activate"
 Write-Host "  Get-Content .env | ForEach-Object { `$k,`$v = `$_ -split '=',2; `$env:`$k = `$v }"
 Write-Host "  python manage.py runserver"
