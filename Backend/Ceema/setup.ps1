@@ -32,11 +32,15 @@ if (-not (Get-Command psql -ErrorAction SilentlyContinue)) {
     }
 }
 
-# Create virtual environment
-if (-not (Test-Path "venv")) {
-    Write-Host "Creating virtual environment..."
-    python -m venv venv
+# Remove any existing venv (may be from another OS)
+if (Test-Path "venv") {
+    Write-Host "Removing old virtual environment..."
+    Remove-Item -Recurse -Force "venv"
 }
+
+# Create virtual environment
+Write-Host "Creating virtual environment..."
+python -m venv venv
 
 # Install dependencies
 Write-Host "Installing dependencies..."
@@ -45,9 +49,7 @@ Write-Host "Installing dependencies..."
 Write-Host "Dependencies installed." -ForegroundColor Green
 
 # Set postgres password for psql commands
-if ($PostgresPass) {
-    $env:PGPASSWORD = $PostgresPass
-}
+$env:PGPASSWORD = $PostgresPass
 
 # Create DB user and database
 Write-Host "Setting up PostgreSQL..."
