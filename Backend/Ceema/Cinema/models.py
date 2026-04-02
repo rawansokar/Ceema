@@ -17,6 +17,10 @@ class User(models.Model):
     points = models.PositiveIntegerField(default=0)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=ROLE_USER)
 
+    # Required by DRF permission classes
+    is_authenticated = True
+    is_anonymous = False
+
     def __str__(self):
         return self.name
 

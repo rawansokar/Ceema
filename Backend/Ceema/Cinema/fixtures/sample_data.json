@@ -1,0 +1,84 @@
+[
+  {"model": "Cinema.user", "pk": 1, "fields": {"name": "Alice Admin", "email": "alice@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 0, "role": "admin"}},
+  {"model": "Cinema.user", "pk": 2, "fields": {"name": "Bob Admin", "email": "bob@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 0, "role": "admin"}},
+  {"model": "Cinema.user", "pk": 3, "fields": {"name": "Sara User", "email": "sara@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 30, "role": "user"}},
+  {"model": "Cinema.user", "pk": 4, "fields": {"name": "Omar User", "email": "omar@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 10, "role": "user"}},
+  {"model": "Cinema.user", "pk": 5, "fields": {"name": "Rawan User", "email": "rawan@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 50, "role": "user"}},
+  {"model": "Cinema.user", "pk": 6, "fields": {"name": "Layla User", "email": "layla@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 20, "role": "user"}},
+  {"model": "Cinema.user", "pk": 7, "fields": {"name": "Karim User", "email": "karim@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 0, "role": "user"}},
+
+  {"model": "Cinema.admin", "pk": 1, "fields": {}},
+  {"model": "Cinema.admin", "pk": 2, "fields": {}},
+
+  {"model": "Cinema.profile", "pk": 1, "fields": {"user": 1, "bio": "Platform administrator.", "followers_count": 0}},
+  {"model": "Cinema.profile", "pk": 2, "fields": {"user": 2, "bio": "Content manager.", "followers_count": 0}},
+  {"model": "Cinema.profile", "pk": 3, "fields": {"user": 3, "bio": "Movie lover and critic.", "followers_count": 12}},
+  {"model": "Cinema.profile", "pk": 4, "fields": {"user": 4, "bio": "Sci-fi enthusiast.", "followers_count": 5}},
+  {"model": "Cinema.profile", "pk": 5, "fields": {"user": 5, "bio": "Cinema addict.", "followers_count": 30}},
+  {"model": "Cinema.profile", "pk": 6, "fields": {"user": 6, "bio": "Watches everything.", "followers_count": 8}},
+  {"model": "Cinema.profile", "pk": 7, "fields": {"user": 7, "bio": "New here!", "followers_count": 0}},
+
+  {"model": "Cinema.movie", "pk": 1, "fields": {"title": "Interstellar", "description": "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.", "duration": 169, "genre": "Sci-Fi", "rating": "9.0"}},
+  {"model": "Cinema.movie", "pk": 2, "fields": {"title": "The Dark Knight", "description": "When the menace known as the Joker wreaks havoc on Gotham City, Batman must face one of his greatest tests.", "duration": 152, "genre": "Action", "rating": "9.0"}},
+  {"model": "Cinema.movie", "pk": 3, "fields": {"title": "Parasite", "description": "Greed and class discrimination threaten the symbiotic relationship between the wealthy Park family and the poor Kim clan.", "duration": 132, "genre": "Thriller", "rating": "8.5"}},
+
+  {"model": "Cinema.showtime", "pk": 1, "fields": {"movie": 1, "date": "2026-04-10", "time": "18:00:00"}},
+  {"model": "Cinema.showtime", "pk": 2, "fields": {"movie": 1, "date": "2026-04-11", "time": "21:00:00"}},
+  {"model": "Cinema.showtime", "pk": 3, "fields": {"movie": 2, "date": "2026-04-10", "time": "20:00:00"}},
+  {"model": "Cinema.showtime", "pk": 4, "fields": {"movie": 3, "date": "2026-04-12", "time": "19:30:00"}},
+
+  {"model": "Cinema.seat", "pk": 1,  "fields": {"showtime": 1, "seat_number": "A1", "status": "booked"}},
+  {"model": "Cinema.seat", "pk": 2,  "fields": {"showtime": 1, "seat_number": "A2", "status": "available"}},
+  {"model": "Cinema.seat", "pk": 3,  "fields": {"showtime": 1, "seat_number": "A3", "status": "available"}},
+  {"model": "Cinema.seat", "pk": 4,  "fields": {"showtime": 1, "seat_number": "B1", "status": "available"}},
+  {"model": "Cinema.seat", "pk": 5,  "fields": {"showtime": 2, "seat_number": "A1", "status": "available"}},
+  {"model": "Cinema.seat", "pk": 6,  "fields": {"showtime": 2, "seat_number": "A2", "status": "available"}},
+  {"model": "Cinema.seat", "pk": 7,  "fields": {"showtime": 3, "seat_number": "A1", "status": "booked"}},
+  {"model": "Cinema.seat", "pk": 8,  "fields": {"showtime": 3, "seat_number": "A2", "status": "available"}},
+  {"model": "Cinema.seat", "pk": 9,  "fields": {"showtime": 4, "seat_number": "A1", "status": "available"}},
+  {"model": "Cinema.seat", "pk": 10, "fields": {"showtime": 4, "seat_number": "A2", "status": "available"}},
+
+  {"model": "Cinema.booking", "pk": 1, "fields": {"user": 3, "showtime": 1, "booking_date": "2026-04-01T10:00:00Z", "total_price": "50.00", "status": "confirmed"}},
+  {"model": "Cinema.booking", "pk": 2, "fields": {"user": 4, "showtime": 3, "booking_date": "2026-04-01T11:00:00Z", "total_price": "50.00", "status": "confirmed"}},
+  {"model": "Cinema.booking", "pk": 3, "fields": {"user": 5, "showtime": 4, "booking_date": "2026-04-02T09:00:00Z", "total_price": "100.00", "status": "pending"}},
+
+  {"model": "Cinema.ticket", "pk": 1, "fields": {"booking": 1, "showtime": 1, "seat": 1, "ticket_code": "TCK-001-A1", "qr_code": "QR-1-A1"}},
+  {"model": "Cinema.ticket", "pk": 2, "fields": {"booking": 2, "showtime": 3, "seat": 7, "ticket_code": "TCK-002-A1", "qr_code": "QR-2-A1"}},
+
+  {"model": "Cinema.review", "pk": 1, "fields": {"user": 3, "movie": 1, "rating": 5, "comment": "Mind-blowing visuals and story. A masterpiece.", "course": null}},
+  {"model": "Cinema.review", "pk": 2, "fields": {"user": 4, "movie": 1, "rating": 4, "comment": "Great film but ending was a bit confusing.", "course": null}},
+  {"model": "Cinema.review", "pk": 3, "fields": {"user": 5, "movie": 2, "rating": 5, "comment": "The Joker is the best villain ever written.", "course": null}},
+  {"model": "Cinema.review", "pk": 4, "fields": {"user": 6, "movie": 3, "rating": 5, "comment": "Parasite deserved every Oscar it won.", "course": null}},
+
+  {"model": "Cinema.post", "pk": 1, "fields": {"user": 3, "content": "Just watched Interstellar again — still gets me every time!", "created_at": "2026-04-01T12:00:00Z"}},
+  {"model": "Cinema.post", "pk": 2, "fields": {"user": 4, "content": "Anyone else think The Dark Knight trilogy is the GOAT?", "created_at": "2026-04-01T13:00:00Z"}},
+  {"model": "Cinema.post", "pk": 3, "fields": {"user": 5, "content": "Parasite shocked me from start to finish. 10/10.", "created_at": "2026-04-02T08:00:00Z"}},
+
+  {"model": "Cinema.comment", "pk": 1, "fields": {"user": 4, "post": 1, "content": "Same! The docking scene never gets old.", "created_at": "2026-04-01T12:30:00Z"}},
+  {"model": "Cinema.comment", "pk": 2, "fields": {"user": 5, "post": 1, "content": "Hans Zimmer's score is unreal.", "created_at": "2026-04-01T12:45:00Z"}},
+  {"model": "Cinema.comment", "pk": 3, "fields": {"user": 3, "post": 2, "content": "100% agree. Nolan is a genius.", "created_at": "2026-04-01T13:30:00Z"}},
+
+  {"model": "Cinema.postlike", "pk": 1, "fields": {"user": 4, "post": 1, "created_at": "2026-04-01T12:10:00Z"}},
+  {"model": "Cinema.postlike", "pk": 2, "fields": {"user": 5, "post": 1, "created_at": "2026-04-01T12:15:00Z"}},
+  {"model": "Cinema.postlike", "pk": 3, "fields": {"user": 3, "post": 2, "created_at": "2026-04-01T13:05:00Z"}},
+
+  {"model": "Cinema.badge", "pk": 1, "fields": {"name": "First Booking", "description": "Made your first cinema booking.", "users": [3, 4]}},
+  {"model": "Cinema.badge", "pk": 2, "fields": {"name": "Cinephile", "description": "Watched 10 movies.", "users": [5]}},
+  {"model": "Cinema.badge", "pk": 3, "fields": {"name": "Social Butterfly", "description": "Made 5 posts.", "users": []}},
+
+  {"model": "Cinema.reward", "pk": 1, "fields": {"name": "Free Popcorn", "points_required": 20, "users": [5, 6]}},
+  {"model": "Cinema.reward", "pk": 2, "fields": {"name": "Free Ticket", "points_required": 50, "users": [5]}},
+  {"model": "Cinema.reward", "pk": 3, "fields": {"name": "VIP Lounge Access", "points_required": 100, "users": []}},
+
+  {"model": "Cinema.course", "pk": 1, "fields": {"title": "History of Cinema", "description": "A deep dive into the evolution of film from silent movies to modern blockbusters.", "users": [3, 5]}},
+  {"model": "Cinema.course", "pk": 2, "fields": {"title": "Film Criticism 101", "description": "Learn how to analyse and critique films like a professional.", "users": [4]}},
+  {"model": "Cinema.course", "pk": 3, "fields": {"title": "Cinematography Basics", "description": "Introduction to camera angles, lighting, and composition in filmmaking.", "users": []}},
+
+  {"model": "Cinema.recommendation", "pk": 1, "fields": {"user": 3, "movie": 2, "type": "based_on_genre"}},
+  {"model": "Cinema.recommendation", "pk": 2, "fields": {"user": 3, "movie": 3, "type": "trending"}},
+  {"model": "Cinema.recommendation", "pk": 3, "fields": {"user": 4, "movie": 1, "type": "based_on_genre"}},
+  {"model": "Cinema.recommendation", "pk": 4, "fields": {"user": 5, "movie": 3, "type": "top_rated"}},
+
+  {"model": "Cinema.report", "pk": 1, "fields": {"admin": 1, "generated_at": "2026-04-01T09:00:00Z"}},
+  {"model": "Cinema.report", "pk": 2, "fields": {"admin": 1, "generated_at": "2026-04-02T09:00:00Z"}}
+]
