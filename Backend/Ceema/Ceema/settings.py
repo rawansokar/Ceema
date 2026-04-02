@@ -129,4 +129,15 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "CEEMA API",
     "DESCRIPTION": "Cinema platform API — movies, bookings, tickets, social features.",
     "VERSION": "1.0.0",
+    "SECURITY": [{"BearerAuth": []}],
+    "APPEND_COMPONENTS": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+            }
+        }
+    },
+    "SERVE_INCLUDE_SCHEMA": False,
 }

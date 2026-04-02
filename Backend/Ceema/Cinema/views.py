@@ -1,7 +1,8 @@
 import uuid
 
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, status, viewsets
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from rest_framework import generics, serializers as drf_serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -36,6 +37,12 @@ from .serializers import (
 
 # ---------- Auth ----------
 
+@extend_schema(
+    tags=["auth"],
+    request=RegisterSerializer,
+    responses={201: UserSerializer},
+    summary="Register a new user account",
+)
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
@@ -53,6 +60,16 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    tags=["auth"],
+    request=LoginSerializer,
+    responses={200: inline_serializer("LoginResponse", fields={
+        "access": drf_serializers.CharField(),
+        "refresh": drf_serializers.CharField(),
+        "user": UserSerializer(),
+    })},
+    summary="Login and receive JWT tokens",
+)
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -68,6 +85,12 @@ class LoginView(APIView):
         })
 
 
+@extend_schema(
+    tags=["auth"],
+    request=None,
+    responses={200: inline_serializer("LogoutResponse", fields={"detail": drf_serializers.CharField()})},
+    summary="Logout (client should discard the token)",
+)
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -78,6 +101,7 @@ class LogoutView(APIView):
 
 # ---------- Users ----------
 
+@extend_schema(tags=["users"])
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -110,6 +134,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 # ---------- Movies ----------
 
+@extend_schema(tags=["movies"])
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
@@ -144,6 +169,7 @@ class MovieViewSet(viewsets.ModelViewSet):
 
 # ---------- Showtimes ----------
 
+@extend_schema(tags=["showtimes"])
 class ShowtimeViewSet(viewsets.ModelViewSet):
     queryset = Showtime.objects.select_related("movie").all()
     serializer_class = ShowtimeSerializer
@@ -162,6 +188,7 @@ class ShowtimeViewSet(viewsets.ModelViewSet):
 
 # ---------- Bookings ----------
 
+@extend_schema(tags=["bookings"])
 class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
@@ -176,6 +203,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             return BookingCreateSerializer
         return BookingSerializer
 
+    @extend_schema(request=BookingCreateSerializer, responses={201: BookingSerializer})
     def create(self, request, *args, **kwargs):
         serializer = BookingCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -229,6 +257,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 
 # ---------- Posts ----------
 
+@extend_schema(tags=["posts"])
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by("-created_at")
     serializer_class = PostSerializer
@@ -264,6 +293,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 # ---------- Courses ----------
 
+@extend_schema(tags=["courses"])
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -286,12 +316,14 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 # ---------- Badges & Rewards ----------
 
+@extend_schema(tags=["badges & rewards"])
 class BadgeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Badge.objects.all()
     serializer_class = BadgeSerializer
     permission_classes = [IsAuthenticated]
 
 
+@extend_schema(tags=["badges & rewards"])
 class RewardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Reward.objects.all()
     serializer_class = RewardSerializer
@@ -300,6 +332,7 @@ class RewardViewSet(viewsets.ReadOnlyModelViewSet):
 
 # ---------- Recommendations ----------
 
+@extend_schema(tags=["recommendations"])
 class RecommendationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RecommendationSerializer
     permission_classes = [IsAuthenticated]
@@ -310,6 +343,7 @@ class RecommendationViewSet(viewsets.ReadOnlyModelViewSet):
 
 # ---------- Admin: Reports ----------
 
+@extend_schema(tags=["admin"])
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
@@ -323,6 +357,7 @@ class ReportViewSet(viewsets.ModelViewSet):
 
 # ---------- Admin: User management ----------
 
+@extend_schema(tags=["admin"])
 class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer

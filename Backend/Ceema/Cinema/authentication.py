@@ -1,7 +1,20 @@
+from drf_spectacular.extensions import OpenApiAuthenticationExtension
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 from .models import User
+
+
+class CinemaJWTAuthenticationScheme(OpenApiAuthenticationExtension):
+    target_class = "Cinema.authentication.CinemaJWTAuthentication"
+    name = "BearerAuth"
+
+    def get_security_definition(self, auto_schema):
+        return {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+        }
 
 
 class CinemaJWTAuthentication(JWTAuthentication):
