@@ -1,7 +1,7 @@
 [
   {"model": "Cinema.user", "pk": 1, "fields": {"name": "Alice Admin", "email": "alice@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 0, "role": "admin"}},
   {"model": "Cinema.user", "pk": 2, "fields": {"name": "Bob Admin", "email": "bob@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 0, "role": "admin"}},
-  {"model": "Cinema.user", "pk": 3, "fields": {"name": "Sara User", "email": "sara@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 30, "role": "user"}},
+  {"model": "Cinema.user", "pk": 3, "fields": {"name": "Rania User", "email": "rania@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 30, "role": "user"}},
   {"model": "Cinema.user", "pk": 4, "fields": {"name": "Omar User", "email": "omar@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 10, "role": "user"}},
   {"model": "Cinema.user", "pk": 5, "fields": {"name": "Rawan User", "email": "rawan@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 50, "role": "user"}},
   {"model": "Cinema.user", "pk": 6, "fields": {"name": "Layla User", "email": "layla@ceema.com", "password": "pbkdf2_sha256$1000000$T5t4gZoKgEOas4fJSi9fKE$6685wjhAFJH2dokzLeJl7W6P+/dM2msU+ahRTrfaPAA=", "points": 20, "role": "user"}},
