@@ -149,6 +149,39 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/admin/reports/{id}/review/:
+    post:
+      operationId: admin_reports_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this report.
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Report'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Report'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Report'
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+          description: ''
   /api/admin/users/:
     get:
       operationId: admin_users_list
@@ -296,6 +329,89 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/admin/users/{id}/ban/:
+    post:
+      operationId: admin_users_ban_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/admin/users/{id}/unban/:
+    post:
+      operationId: admin_users_unban_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/admin/users/statistics/:
+    get:
+      operationId: admin_users_statistics_retrieve
+      tags:
+      - admin
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
   /api/auth/login/:
     post:
       operationId: auth_login_create
@@ -488,7 +604,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this booking.
         required: true
       tags:
       - bookings
@@ -508,7 +625,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this booking.
         required: true
       tags:
       - bookings
@@ -540,7 +658,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this booking.
         required: true
       tags:
       - bookings
@@ -571,7 +690,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this booking.
         required: true
       tags:
       - bookings
@@ -588,7 +708,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this booking.
         required: true
       tags:
       - bookings
@@ -621,7 +742,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this booking.
         required: true
       tags:
       - bookings
@@ -634,6 +756,240 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Booking'
+          description: ''
+  /api/chatbot/:
+    get:
+      operationId: chatbot_list
+      tags:
+      - chatbot
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chatbot'
+          description: ''
+    post:
+      operationId: chatbot_create
+      tags:
+      - chatbot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chatbot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Chatbot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Chatbot'
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chatbot'
+          description: ''
+  /api/chatbot/{id}/:
+    get:
+      operationId: chatbot_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chatbot.
+        required: true
+      tags:
+      - chatbot
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chatbot'
+          description: ''
+    put:
+      operationId: chatbot_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chatbot.
+        required: true
+      tags:
+      - chatbot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chatbot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Chatbot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Chatbot'
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chatbot'
+          description: ''
+    patch:
+      operationId: chatbot_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chatbot.
+        required: true
+      tags:
+      - chatbot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChatbot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChatbot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChatbot'
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chatbot'
+          description: ''
+    delete:
+      operationId: chatbot_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chatbot.
+        required: true
+      tags:
+      - chatbot
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/chatbot/{id}/ask-mood-question/:
+    post:
+      operationId: chatbot_ask_mood_question_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chatbot.
+        required: true
+      tags:
+      - chatbot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chatbot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Chatbot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Chatbot'
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chatbot'
+          description: ''
+  /api/chatbot/{id}/receive-answer/:
+    post:
+      operationId: chatbot_receive_answer_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chatbot.
+        required: true
+      tags:
+      - chatbot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatbotAnswer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChatbotAnswer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChatbotAnswer'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chatbot'
+          description: ''
+  /api/chatbot/{id}/recommend-movies/:
+    get:
+      operationId: chatbot_recommend_movies_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chatbot.
+        required: true
+      tags:
+      - chatbot
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chatbot'
           description: ''
   /api/courses/:
     get:
@@ -1054,6 +1410,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/Movie'
           description: ''
+  /api/movies/{id}/showtimes/:
+    get:
+      operationId: movies_showtimes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this movie.
+        required: true
+      tags:
+      - movies
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+          description: ''
   /api/movies/search/:
     get:
       operationId: movies_search_retrieve
@@ -1069,6 +1447,180 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Movie'
+          description: ''
+  /api/payments/:
+    get:
+      operationId: payments_list
+      tags:
+      - payments
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+          description: ''
+    post:
+      operationId: payments_create
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Payment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Payment'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/payments/{id}/:
+    get:
+      operationId: payments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment transaction.
+        required: true
+      tags:
+      - payments
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+    put:
+      operationId: payments_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment transaction.
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Payment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Payment'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+    patch:
+      operationId: payments_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment transaction.
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPayment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPayment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPayment'
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+    delete:
+      operationId: payments_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment transaction.
+        required: true
+      tags:
+      - payments
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/payments/mock-process/:
+    post:
+      operationId: payments_mock_process_create
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentProcess'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentProcess'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentProcess'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
           description: ''
   /api/posts/:
     get:
@@ -1306,6 +1858,79 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
           description: ''
+  /api/posts/{id}/share/:
+    post:
+      operationId: posts_share_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this post.
+        required: true
+      tags:
+      - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Post'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Post'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: ''
+  /api/purchases/:
+    get:
+      operationId: purchases_list
+      tags:
+      - purchases
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Purchase'
+          description: ''
+  /api/purchases/{id}/:
+    get:
+      operationId: purchases_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this purchase.
+        required: true
+      tags:
+      - purchases
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+          description: ''
   /api/recommendations/:
     get:
       operationId: recommendations_list
@@ -1330,7 +1955,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this recommendation.
         required: true
       tags:
       - recommendations
@@ -1344,6 +1970,153 @@ paths:
               schema:
                 $ref: '#/components/schemas/Recommendation'
           description: ''
+  /api/reviews/:
+    get:
+      operationId: reviews_list
+      tags:
+      - reviews
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+          description: ''
+    post:
+      operationId: reviews_create
+      tags:
+      - reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /api/reviews/{id}/:
+    get:
+      operationId: reviews_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this review.
+        required: true
+      tags:
+      - reviews
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    put:
+      operationId: reviews_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this review.
+        required: true
+      tags:
+      - reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    patch:
+      operationId: reviews_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this review.
+        required: true
+      tags:
+      - reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedReview'
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    delete:
+      operationId: reviews_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this review.
+        required: true
+      tags:
+      - reviews
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/rewards/:
     get:
       operationId: rewards_list
@@ -1382,6 +2155,257 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reward'
+          description: ''
+  /api/rewards/{id}/redeem/:
+    post:
+      operationId: rewards_redeem_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this reward.
+        required: true
+      tags:
+      - badges & rewards
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reward'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Reward'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Reward'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+          description: ''
+  /api/seats/:
+    get:
+      operationId: seats_list
+      tags:
+      - seats
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Seat'
+          description: ''
+    post:
+      operationId: seats_create
+      tags:
+      - seats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Seat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Seat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Seat'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seat'
+          description: ''
+  /api/seats/{id}/:
+    get:
+      operationId: seats_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this seat.
+        required: true
+      tags:
+      - seats
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seat'
+          description: ''
+    put:
+      operationId: seats_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this seat.
+        required: true
+      tags:
+      - seats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Seat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Seat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Seat'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seat'
+          description: ''
+    patch:
+      operationId: seats_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this seat.
+        required: true
+      tags:
+      - seats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSeat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSeat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSeat'
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seat'
+          description: ''
+    delete:
+      operationId: seats_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this seat.
+        required: true
+      tags:
+      - seats
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/seats/{id}/release/:
+    post:
+      operationId: seats_release_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this seat.
+        required: true
+      tags:
+      - seats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Seat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Seat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Seat'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seat'
+          description: ''
+  /api/seats/{id}/reserve/:
+    post:
+      operationId: seats_reserve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this seat.
+        required: true
+      tags:
+      - seats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Seat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Seat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Seat'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seat'
           description: ''
   /api/showtimes/:
     get:
@@ -1555,6 +2579,45 @@ paths:
               schema:
                 $ref: '#/components/schemas/Showtime'
           description: ''
+  /api/tickets/:
+    get:
+      operationId: tickets_list
+      tags:
+      - tickets
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ticket'
+          description: ''
+  /api/tickets/{id}/:
+    get:
+      operationId: tickets_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ticket.
+        required: true
+      tags:
+      - tickets
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+          description: ''
   /api/users/:
     get:
       operationId: users_list
@@ -1702,6 +2765,84 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/users/{id}/follow/:
+    post:
+      operationId: users_follow_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/followers/:
+    get:
+      operationId: users_followers_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/following/:
+    get:
+      operationId: users_following_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
   /api/users/{id}/profile/:
     get:
       operationId: users_profile_retrieve
@@ -1789,6 +2930,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
+  /api/users/{id}/unfollow/:
+    post:
+      operationId: users_unfollow_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - BearerAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
 components:
   schemas:
     Badge:
@@ -1829,7 +3004,7 @@ components:
           format: decimal
           pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
         status:
-          $ref: '#/components/schemas/StatusEnum'
+          $ref: '#/components/schemas/BookingStatusEnum'
         tickets:
           type: array
           items:
@@ -1860,6 +3035,80 @@ components:
       required:
       - seat_ids
       - showtime_id
+    BookingStatusEnum:
+      enum:
+      - pending
+      - confirmed
+      - cancelled
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `confirmed` - Confirmed
+        * `cancelled` - Cancelled
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        chatbot:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+        sender:
+          $ref: '#/components/schemas/SenderEnum'
+      required:
+      - chatbot
+      - content
+      - id
+      - sender
+      - timestamp
+    Chatbot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+          nullable: true
+        current_mood:
+          type: string
+          maxLength: 100
+        last_question:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - messages
+      - updated_at
+      - user
+    ChatbotAnswer:
+      type: object
+      properties:
+        answer:
+          type: string
+      required:
+      - answer
     Course:
       type: object
       properties:
@@ -1871,6 +3120,10 @@ components:
           maxLength: 200
         description:
           type: string
+        url:
+          type: string
+          format: uri
+          maxLength: 200
         enrolled_count:
           type: integer
           readOnly: true
@@ -1924,12 +3177,17 @@ components:
           type: string
         duration:
           type: integer
-          maximum: 2147483647
+          maximum: 9223372036854775807
           minimum: 0
+          format: int64
           description: Duration in minutes
         genre:
           type: string
           maxLength: 100
+        image_url:
+          type: string
+          format: uri
+          maxLength: 200
         rating:
           type: string
           format: decimal
@@ -1963,11 +3221,39 @@ components:
           format: decimal
           pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
         status:
-          $ref: '#/components/schemas/StatusEnum'
+          $ref: '#/components/schemas/BookingStatusEnum'
         tickets:
           type: array
           items:
             $ref: '#/components/schemas/Ticket'
+          readOnly: true
+    PatchedChatbot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+          nullable: true
+        current_mood:
+          type: string
+          maxLength: 100
+        last_question:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
           readOnly: true
     PatchedCourse:
       type: object
@@ -1980,6 +3266,10 @@ components:
           maxLength: 200
         description:
           type: string
+        url:
+          type: string
+          format: uri
+          maxLength: 200
         enrolled_count:
           type: integer
           readOnly: true
@@ -1996,16 +3286,51 @@ components:
           type: string
         duration:
           type: integer
-          maximum: 2147483647
+          maximum: 9223372036854775807
           minimum: 0
+          format: int64
           description: Duration in minutes
         genre:
           type: string
           maxLength: 100
+        image_url:
+          type: string
+          format: uri
+          maxLength: 200
         rating:
           type: string
           format: decimal
           pattern: ^-?\d{0,2}(?:\.\d{0,1})?$
+    PatchedPayment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        booking:
+          type: integer
+        purchase:
+          type: integer
+          nullable: true
+        provider:
+          type: string
+          maxLength: 100
+        method:
+          type: string
+          maxLength: 100
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/PaymentStatusEnum'
+        external_reference:
+          type: string
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedPost:
       type: object
       properties:
@@ -2020,6 +3345,12 @@ components:
           readOnly: true
         content:
           type: string
+        original_post:
+          type: integer
+          nullable: true
+        original_post_content:
+          type: string
+          readOnly: true
         created_at:
           type: string
           format: date-time
@@ -2042,9 +3373,80 @@ components:
         admin_name:
           type: string
           readOnly: true
+        reason:
+          type: string
+        status:
+          $ref: '#/components/schemas/ReportStatusEnum'
+        content_type:
+          type: string
+          maxLength: 50
+        content_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
         generated_at:
           type: string
           format: date-time
+          readOnly: true
+    PatchedReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        movie:
+          type: integer
+          readOnly: true
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comment:
+          type: string
+        course:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedSeat:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        seat_number:
+          type: string
+          maxLength: 20
+        status:
+          $ref: '#/components/schemas/SeatStatusEnum'
+        row:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        column:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        is_available:
+          type: boolean
           readOnly: true
     PatchedShowtime:
       type: object
@@ -2063,6 +3465,9 @@ components:
         time:
           type: string
           format: time
+        hall:
+          type: string
+          maxLength: 100
     PatchedUser:
       type: object
       properties:
@@ -2076,15 +3481,38 @@ components:
           type: string
           format: email
           maxLength: 254
+        age:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        preferred_genres: {}
+        mood_preference:
+          type: string
+          maxLength: 100
         points:
           type: integer
-          maximum: 2147483647
+          maximum: 9223372036854775807
           minimum: 0
+          format: int64
         role:
           $ref: '#/components/schemas/RoleEnum'
+        is_banned:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
         profile:
           allOf:
           - $ref: '#/components/schemas/Profile'
+          readOnly: true
+        followers_count:
+          type: integer
+          readOnly: true
+        following_count:
+          type: integer
           readOnly: true
     PatchedUserUpdate:
       type: object
@@ -2096,6 +3524,79 @@ components:
           type: string
           format: email
           maxLength: 254
+        age:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        preferred_genres: {}
+        mood_preference:
+          type: string
+          maxLength: 100
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        booking:
+          type: integer
+        purchase:
+          type: integer
+          nullable: true
+        provider:
+          type: string
+          maxLength: 100
+        method:
+          type: string
+          maxLength: 100
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/PaymentStatusEnum'
+        external_reference:
+          type: string
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - booking
+      - created_at
+      - id
+    PaymentProcess:
+      type: object
+      properties:
+        booking_id:
+          type: integer
+        provider:
+          type: string
+          default: mock
+        method:
+          type: string
+          default: mock-card
+        mark_paid:
+          type: boolean
+          default: true
+      required:
+      - booking_id
+    PaymentStatusEnum:
+      enum:
+      - pending
+      - paid
+      - failed
+      - refunded
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `paid` - Paid
+        * `failed` - Failed
+        * `refunded` - Refunded
     Post:
       type: object
       properties:
@@ -2110,6 +3611,12 @@ components:
           readOnly: true
         content:
           type: string
+        original_post:
+          type: integer
+          nullable: true
+        original_post_content:
+          type: string
+          readOnly: true
         created_at:
           type: string
           format: date-time
@@ -2126,6 +3633,7 @@ components:
       - created_at
       - id
       - likes_count
+      - original_post_content
       - user
       - user_name
     Profile:
@@ -2136,12 +3644,54 @@ components:
           readOnly: true
         bio:
           type: string
+        avatar_url:
+          type: string
+          format: uri
+          maxLength: 200
+        portfolio: {}
         followers_count:
           type: integer
-          maximum: 2147483647
+          maximum: 9223372036854775807
           minimum: 0
+          format: int64
       required:
       - id
+    Purchase:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        booking:
+          type: integer
+          nullable: true
+        purchase_date:
+          type: string
+          format: date-time
+          readOnly: true
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        payment_status:
+          $ref: '#/components/schemas/PaymentStatusEnum'
+        points_earned:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - id
+      - purchase_date
+      - total_amount
+      - user
+      - user_name
     Recommendation:
       type: object
       properties:
@@ -2176,6 +3726,16 @@ components:
           type: string
           writeOnly: true
           minLength: 6
+        age:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        preferred_genres: {}
+        mood_preference:
+          type: string
+          maxLength: 100
         role:
           allOf:
           - $ref: '#/components/schemas/RoleEnum'
@@ -2198,6 +3758,23 @@ components:
         admin_name:
           type: string
           readOnly: true
+        reason:
+          type: string
+        status:
+          $ref: '#/components/schemas/ReportStatusEnum'
+        content_type:
+          type: string
+          maxLength: 50
+        content_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
         generated_at:
           type: string
           format: date-time
@@ -2205,8 +3782,57 @@ components:
       required:
       - admin
       - admin_name
+      - created_at
       - generated_at
       - id
+    ReportStatusEnum:
+      enum:
+      - open
+      - reviewed
+      - resolved
+      - dismissed
+      type: string
+      description: |-
+        * `open` - Open
+        * `reviewed` - Reviewed
+        * `resolved` - Resolved
+        * `dismissed` - Dismissed
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        movie:
+          type: integer
+          readOnly: true
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comment:
+          type: string
+        course:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - comment
+      - created_at
+      - id
+      - movie
+      - rating
+      - user
+      - user_name
     Reward:
       type: object
       properties:
@@ -2218,8 +3844,9 @@ components:
           maxLength: 100
         points_required:
           type: integer
-          maximum: 2147483647
+          maximum: 9223372036854775807
           minimum: 0
+          format: int64
       required:
       - id
       - name
@@ -2232,6 +3859,56 @@ components:
       description: |-
         * `user` - User
         * `admin` - Admin
+    Seat:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        seat_number:
+          type: string
+          maxLength: 20
+        status:
+          $ref: '#/components/schemas/SeatStatusEnum'
+        row:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        column:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        is_available:
+          type: boolean
+          readOnly: true
+      required:
+      - id
+      - is_available
+      - seat_number
+    SeatStatusEnum:
+      enum:
+      - available
+      - reserved
+      - booked
+      type: string
+      description: |-
+        * `available` - Available
+        * `reserved` - Reserved
+        * `booked` - Booked
+    SenderEnum:
+      enum:
+      - guest
+      - user
+      - bot
+      type: string
+      description: |-
+        * `guest` - Guest
+        * `user` - User
+        * `bot` - Bot
     Showtime:
       type: object
       properties:
@@ -2249,22 +3926,15 @@ components:
         time:
           type: string
           format: time
+        hall:
+          type: string
+          maxLength: 100
       required:
       - date
       - id
       - movie
       - movie_title
       - time
-    StatusEnum:
-      enum:
-      - pending
-      - confirmed
-      - cancelled
-      type: string
-      description: |-
-        * `pending` - Pending
-        * `confirmed` - Confirmed
-        * `cancelled` - Cancelled
     Ticket:
       type: object
       properties:
@@ -2281,6 +3951,18 @@ components:
         seat_number:
           type: string
           readOnly: true
+        booking_date:
+          type: string
+          format: date-time
+          readOnly: true
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
         ticket_code:
           type: string
           maxLength: 100
@@ -2289,12 +3971,15 @@ components:
           maxLength: 255
       required:
       - booking
+      - booking_date
       - id
       - qr_code
       - seat
       - seat_number
       - showtime
+      - status
       - ticket_code
+      - total_price
     TokenRefresh:
       type: object
       properties:
@@ -2320,18 +4005,44 @@ components:
           type: string
           format: email
           maxLength: 254
+        age:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        preferred_genres: {}
+        mood_preference:
+          type: string
+          maxLength: 100
         points:
           type: integer
-          maximum: 2147483647
+          maximum: 9223372036854775807
           minimum: 0
+          format: int64
         role:
           $ref: '#/components/schemas/RoleEnum'
+        is_banned:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
         profile:
           allOf:
           - $ref: '#/components/schemas/Profile'
           readOnly: true
+        followers_count:
+          type: integer
+          readOnly: true
+        following_count:
+          type: integer
+          readOnly: true
       required:
+      - created_at
       - email
+      - followers_count
+      - following_count
       - id
       - name
       - profile
@@ -2345,6 +4056,16 @@ components:
           type: string
           format: email
           maxLength: 254
+        age:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        preferred_genres: {}
+        mood_preference:
+          type: string
+          maxLength: 100
       required:
       - email
       - name

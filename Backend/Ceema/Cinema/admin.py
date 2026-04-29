@@ -4,13 +4,17 @@ from .models import (
     Admin,
     Badge,
     Booking,
+    Chatbot,
+    ChatMessage,
     Comment,
     Course,
+    Follow,
     Movie,
     PaymentTransaction,
     Post,
     PostLike,
     Profile,
+    Purchase,
     Recommendation,
     Report,
     Review,
@@ -24,6 +28,7 @@ from .models import (
 admin.site.register(User)
 admin.site.register(Admin)
 admin.site.register(Profile)
+admin.site.register(Follow)
 admin.site.register(Badge)
 admin.site.register(Reward)
 admin.site.register(Course)
@@ -35,7 +40,10 @@ admin.site.register(PostLike)
 admin.site.register(Showtime)
 admin.site.register(Seat)
 admin.site.register(Booking)
+admin.site.register(Purchase)
 admin.site.register(Ticket)
 admin.site.register(PaymentTransaction)
 admin.site.register(Recommendation)
 admin.site.register(Report)
+admin.site.register(Chatbot)
+admin.site.register(ChatMessage)

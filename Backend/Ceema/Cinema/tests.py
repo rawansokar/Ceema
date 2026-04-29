@@ -7,13 +7,17 @@ from .models import (
     Admin,
     Badge,
     Booking,
+    Chatbot,
+    ChatMessage,
     Comment,
     Course,
+    Follow,
     Movie,
     PaymentTransaction,
     Post,
     PostLike,
     Profile,
+    Purchase,
     Recommendation,
     Report,
     Review,
@@ -181,3 +185,58 @@ class CinemaAppTests(TestCase):
         self.assertEqual(self.admin.manage_movies().count(), 1)
         self.assertGreaterEqual(self.admin.manage_users().count(), 2)
         self.assertEqual(self.admin.generate_reports().count(), 1)
+
+    def test_xml_extension_entities_support_demo_flow(self):
+        self.user.age = 25
+        self.user.preferred_genres = ["Sci-Fi", "Drama"]
+        self.user.mood_preference = "curious"
+        self.user.save()
+
+        self.profile.avatar_url = "https://example.com/avatar.png"
+        self.profile.portfolio = ["reviews", "cinema club"]
+        self.profile.save()
+
+        Follow.objects.create(follower=self.admin, following=self.user)
+        self.assertEqual(self.user.follower_links.count(), 1)
+
+        self.movie.image_url = "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"
+        self.movie.save()
+        self.showtime.hall = "Hall A"
+        self.showtime.save()
+        self.seat.row = 1
+        self.seat.column = 1
+        self.seat.save()
+
+        post = Post.objects.create(user=self.user, content="Original thought.")
+        shared = Post.objects.create(
+            user=self.admin,
+            content="Sharing this review.",
+            original_post=post,
+        )
+        self.assertEqual(shared.original_post, post)
+
+        booking = Booking.objects.create(
+            user=self.user,
+            showtime=self.showtime,
+            total_price="100.00",
+            status=Booking.STATUS_CONFIRMED,
+        )
+        purchase = Purchase.objects.create(
+            user=self.user,
+            booking=booking,
+            total_amount="100.00",
+            payment_status=Purchase.PAYMENT_COMPLETE,
+        )
+        self.assertEqual(purchase.calculate_points(), 10)
+
+        chatbot = Chatbot.objects.create(user=self.user)
+        question = chatbot.ask_mood_question()
+        ChatMessage.objects.create(
+            chatbot=chatbot,
+            content=question,
+            sender=ChatMessage.SENDER_BOT,
+        )
+        mood = chatbot.receive_answer("I want something fast and action heavy")
+
+        self.assertEqual(mood, "action")
+        self.assertEqual(chatbot.messages.count(), 1)

@@ -15,10 +15,42 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+
+def healthcheck(request):
+    return JsonResponse({
+        "status": "ok",
+        "service": "CEEMA API",
+        "implemented_domains": [
+            "auth",
+            "users",
+            "profiles",
+            "follows",
+            "movies",
+            "showtimes",
+            "seats",
+            "bookings",
+            "tickets",
+            "purchases",
+            "payments",
+            "posts",
+            "comments",
+            "reviews",
+            "courses",
+            "badges",
+            "rewards",
+            "recommendations",
+            "reports",
+            "chatbot",
+        ],
+    })
+
+
 urlpatterns = [
+    path('', healthcheck, name='healthcheck'),
     path('admin/', admin.site.urls),
     path('api/', include('Cinema.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

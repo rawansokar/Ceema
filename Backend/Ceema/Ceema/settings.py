@@ -67,14 +67,21 @@ postgres_user = os.getenv("POSTGRES_USER")
 postgres_password = os.getenv("POSTGRES_PASSWORD")
 
 if postgres_name and postgres_user and postgres_password:
+    postgres_host = os.getenv("POSTGRES_HOST", "localhost")
+    db_options = {}
+    # Auto-enable SSL for cloud Postgres (Neon, Render, Heroku, etc.)
+    if postgres_host != "localhost" and postgres_host != "127.0.0.1":
+        db_options["sslmode"] = os.getenv("POSTGRES_SSLMODE", "require")
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": postgres_name,
             "USER": postgres_user,
             "PASSWORD": postgres_password,
-            "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+            "HOST": postgres_host,
             "PORT": os.getenv("POSTGRES_PORT", "5432"),
+            "OPTIONS": db_options,
         }
     }
 else:
