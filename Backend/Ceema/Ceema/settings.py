@@ -164,7 +164,7 @@ RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "CEEMA <onboarding@resend.dev>")
 RESEND_REPLY_TO = os.getenv("RESEND_REPLY_TO", "")
 
-EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "resend").lower()
+EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "smtp").lower()
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() == "true"

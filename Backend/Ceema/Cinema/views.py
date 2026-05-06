@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -39,6 +40,8 @@ from .serializers import (
 )
 from .services import send_booking_confirmation_email, send_welcome_email
 
+logger = logging.getLogger(__name__)
+
 
 # ---------- Auth ----------
 
@@ -57,7 +60,9 @@ class RegisterView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         Profile.objects.get_or_create(user=user)
-        send_welcome_email(user)
+        email_result = send_welcome_email(user)
+        if not email_result.get("sent") and not email_result.get("id"):
+            logger.warning("Welcome email was not sent for user %s: %s", user.id, email_result)
         access, refresh = make_tokens(user)
         return Response({
             "user": UserSerializer(user).data,
@@ -339,7 +344,13 @@ class BookingViewSet(viewsets.ModelViewSet):
                 )
 
             booking.award_points(points=points)
-        send_booking_confirmation_email(booking)
+        email_result = send_booking_confirmation_email(booking)
+        if not email_result.get("sent") and not email_result.get("id"):
+            logger.warning(
+                "Booking confirmation email was not sent for booking %s: %s",
+                booking.id,
+                email_result,
+            )
         return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["post"], url_path="cancel")
