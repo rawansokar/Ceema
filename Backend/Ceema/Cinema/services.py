@@ -1,5 +1,6 @@
 import json
 import smtplib
+import base64
 from email.message import EmailMessage
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -8,6 +9,8 @@ from django.conf import settings
 
 
 def send_email(to_email, subject, html):
+    if settings.EMAIL_PROVIDER == "gmail_api":
+        return send_gmail_api_email(to_email, subject, html)
     if settings.EMAIL_PROVIDER == "smtp":
         return send_smtp_email(to_email, subject, html)
     return send_resend_email(to_email, subject, html)
@@ -79,6 +82,57 @@ def send_smtp_email(to_email, subject, html):
         return {"sent": False, "provider": "smtp", "error": str(exc)}
     except OSError as exc:
         return {"sent": False, "provider": "smtp", "error": str(exc)}
+
+
+def send_gmail_api_email(to_email, subject, html):
+    missing = [
+        name
+        for name, value in {
+            "GMAIL_CLIENT_ID": settings.GMAIL_CLIENT_ID,
+            "GMAIL_CLIENT_SECRET": settings.GMAIL_CLIENT_SECRET,
+            "GMAIL_REFRESH_TOKEN": settings.GMAIL_REFRESH_TOKEN,
+            "GMAIL_SENDER_EMAIL": settings.GMAIL_SENDER_EMAIL,
+        }.items()
+        if not value
+    ]
+    if missing:
+        return {"skipped": True, "reason": f"Missing Gmail API settings: {', '.join(missing)}"}
+
+    try:
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request as GoogleAuthRequest
+        from googleapiclient.discovery import build
+    except ImportError as exc:
+        return {"sent": False, "provider": "gmail_api", "error": str(exc)}
+
+    credentials = Credentials(
+        token=None,
+        refresh_token=settings.GMAIL_REFRESH_TOKEN,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=settings.GMAIL_CLIENT_ID,
+        client_secret=settings.GMAIL_CLIENT_SECRET,
+        scopes=["https://www.googleapis.com/auth/gmail.send"],
+    )
+
+    try:
+        credentials.refresh(GoogleAuthRequest())
+
+        message = EmailMessage()
+        message["From"] = f"{settings.GMAIL_FROM_NAME} <{settings.GMAIL_SENDER_EMAIL}>"
+        message["To"] = to_email
+        message["Subject"] = subject
+        message.set_content("This email requires an HTML-capable email client.")
+        message.add_alternative(html, subtype="html")
+
+        raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+        service = build("gmail", "v1", credentials=credentials, cache_discovery=False)
+        result = service.users().messages().send(
+            userId="me",
+            body={"raw": raw_message},
+        ).execute()
+        return {"sent": True, "provider": "gmail_api", "id": result.get("id")}
+    except Exception as exc:
+        return {"sent": False, "provider": "gmail_api", "error": str(exc)}
 
 
 def email_layout(title, body_html):
