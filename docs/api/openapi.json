@@ -2379,6 +2379,46 @@
                 }
             }
         },
+        "/api/movies/{id}/credits/": {
+            "get": {
+                "operationId": "movies_credits_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this movie.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "movies"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Movie"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/movies/{id}/reviews/": {
             "get": {
                 "operationId": "movies_reviews_retrieve",
@@ -2514,6 +2554,151 @@
                 }
             }
         },
+        "/api/movies/featured/": {
+            "get": {
+                "operationId": "movies_featured_retrieve",
+                "tags": [
+                    "movies"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Movie"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/movies/filters/": {
+            "get": {
+                "operationId": "movies_filters_retrieve",
+                "tags": [
+                    "movies"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Movie"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/movies/highest-grossing-egyptian/": {
+            "get": {
+                "operationId": "movies_highest_grossing_egyptian_retrieve",
+                "tags": [
+                    "movies"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Movie"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/movies/in-cinemas/": {
+            "get": {
+                "operationId": "movies_in_cinemas_retrieve",
+                "tags": [
+                    "movies"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Movie"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/movies/now-playing/": {
+            "get": {
+                "operationId": "movies_now_playing_retrieve",
+                "tags": [
+                    "movies"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Movie"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/movies/search/": {
             "get": {
                 "operationId": "movies_search_retrieve",
@@ -2535,6 +2720,296 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Movie"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/news/": {
+            "get": {
+                "operationId": "news_list",
+                "tags": [
+                    "news"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/NewsArticle"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "news_create",
+                "tags": [
+                    "news"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewsArticle"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewsArticle"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewsArticle"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NewsArticle"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/news/{id}/": {
+            "get": {
+                "operationId": "news_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this news article.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "news"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NewsArticle"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "news_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this news article.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "news"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewsArticle"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewsArticle"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewsArticle"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NewsArticle"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "news_partial_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this news article.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "news"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedNewsArticle"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedNewsArticle"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedNewsArticle"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NewsArticle"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "news_destroy",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this news article.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "news"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/news/featured/": {
+            "get": {
+                "operationId": "news_featured_retrieve",
+                "tags": [
+                    "news"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NewsArticle"
                                 }
                             }
                         },
@@ -2842,6 +3317,325 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Payment"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/": {
+            "get": {
+                "operationId": "people_list",
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Person"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "people_create",
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Person"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Person"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Person"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/{id}/": {
+            "get": {
+                "operationId": "people_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this person.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "people_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this person.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Person"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Person"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Person"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "people_partial_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this person.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPerson"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPerson"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPerson"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "people_destroy",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this person.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/people/actors/": {
+            "get": {
+                "operationId": "people_actors_retrieve",
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/filmmakers/": {
+            "get": {
+                "operationId": "people_filmmakers_retrieve",
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
                                 }
                             }
                         },
@@ -5314,6 +6108,17 @@
                 "type": "string",
                 "description": "* `pending` - Pending\n* `confirmed` - Confirmed\n* `cancelled` - Cancelled"
             },
+            "CategoryEnum": {
+                "enum": [
+                    "movies",
+                    "box_office",
+                    "awards",
+                    "streaming",
+                    "tv"
+                ],
+                "type": "string",
+                "description": "* `movies` - Movies\n* `box_office` - Box Office\n* `awards` - Awards\n* `streaming` - Streaming\n* `tv` - TV"
+            },
             "ChatMessage": {
                 "type": "object",
                 "properties": {
@@ -5432,6 +6237,18 @@
                     "title"
                 ]
             },
+            "JobEnum": {
+                "enum": [
+                    "actor",
+                    "director",
+                    "screenwriter",
+                    "dop",
+                    "producer",
+                    "composer"
+                ],
+                "type": "string",
+                "description": "* `actor` - Actor\n* `director` - Director\n* `screenwriter` - Screenwriter\n* `dop` - DOP\n* `producer` - Producer\n* `composer` - Composer"
+            },
             "Login": {
                 "type": "object",
                 "properties": {
@@ -5504,23 +6321,220 @@
                         "type": "string",
                         "maxLength": 100
                     },
+                    "language": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "release_year": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "country": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
                     "image_url": {
                         "type": "string",
                         "format": "uri",
-                        "maxLength": 200
+                        "maxLength": 500
+                    },
+                    "poster_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "poster": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "wide_poster_url": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "backdrop_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "trailer_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
                     },
                     "rating": {
                         "type": "string",
                         "format": "decimal",
                         "pattern": "^-?\\d{0,2}(?:\\.\\d{0,1})?$"
+                    },
+                    "tmdb_id": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "is_now_playing": {
+                        "type": "boolean"
+                    },
+                    "is_coming_soon": {
+                        "type": "boolean"
+                    },
+                    "is_in_cinemas": {
+                        "type": "boolean"
+                    },
+                    "box_office_gross_egp": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "credits": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MovieCredit"
+                        },
+                        "readOnly": true
                     }
                 },
                 "required": [
+                    "credits",
                     "description",
                     "duration",
                     "genre",
                     "id",
-                    "title"
+                    "poster",
+                    "title",
+                    "wide_poster_url"
+                ]
+            },
+            "MovieCredit": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "movie": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "person": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Person"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "person_id": {
+                        "type": "integer",
+                        "writeOnly": true
+                    },
+                    "job": {
+                        "$ref": "#/components/schemas/JobEnum"
+                    },
+                    "character_name": {
+                        "type": "string",
+                        "maxLength": 160
+                    },
+                    "billing_order": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64"
+                    }
+                },
+                "required": [
+                    "character_name",
+                    "id",
+                    "job",
+                    "movie",
+                    "person"
+                ]
+            },
+            "NewsArticle": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "summary": {
+                        "type": "string"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "source_name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "source_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "category": {
+                        "$ref": "#/components/schemas/CategoryEnum"
+                    },
+                    "author": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "created_by": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_by_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "created_by",
+                    "created_by_name",
+                    "id",
+                    "summary",
+                    "title",
+                    "updated_at"
                 ]
             },
             "PatchedBooking": {
@@ -5651,15 +6665,155 @@
                         "type": "string",
                         "maxLength": 100
                     },
+                    "language": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "release_year": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "country": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
                     "image_url": {
                         "type": "string",
                         "format": "uri",
-                        "maxLength": 200
+                        "maxLength": 500
+                    },
+                    "poster_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "poster": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "wide_poster_url": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "backdrop_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "trailer_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
                     },
                     "rating": {
                         "type": "string",
                         "format": "decimal",
                         "pattern": "^-?\\d{0,2}(?:\\.\\d{0,1})?$"
+                    },
+                    "tmdb_id": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "is_now_playing": {
+                        "type": "boolean"
+                    },
+                    "is_coming_soon": {
+                        "type": "boolean"
+                    },
+                    "is_in_cinemas": {
+                        "type": "boolean"
+                    },
+                    "box_office_gross_egp": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "credits": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MovieCredit"
+                        },
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedNewsArticle": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "summary": {
+                        "type": "string"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "source_name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "source_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "category": {
+                        "$ref": "#/components/schemas/CategoryEnum"
+                    },
+                    "author": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "is_published": {
+                        "type": "boolean"
+                    },
+                    "created_by": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_by_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
                     }
                 }
             },
@@ -5696,6 +6850,46 @@
                     "external_reference": {
                         "type": "string",
                         "maxLength": 100
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
+            "PatchedPerson": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "full_name": {
+                        "type": "string",
+                        "maxLength": 160
+                    },
+                    "primary_role": {
+                        "$ref": "#/components/schemas/PrimaryRoleEnum"
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "bio": {
+                        "type": "string"
+                    },
+                    "nationality": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "tmdb_id": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true
                     },
                     "created_at": {
                         "type": "string",
@@ -5875,6 +7069,10 @@
                         "type": "string",
                         "readOnly": true
                     },
+                    "movie_poster": {
+                        "type": "string",
+                        "readOnly": true
+                    },
                     "date": {
                         "type": "string",
                         "format": "date"
@@ -5886,6 +7084,19 @@
                     "hall": {
                         "type": "string",
                         "maxLength": 100
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "cinema_name": {
+                        "type": "string",
+                        "maxLength": 160
+                    },
+                    "ticket_price": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,6}(?:\\.\\d{0,2})?$"
                     }
                 }
             },
@@ -6058,6 +7269,51 @@
                 "type": "string",
                 "description": "* `pending` - Pending\n* `paid` - Paid\n* `failed` - Failed\n* `refunded` - Refunded"
             },
+            "Person": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "full_name": {
+                        "type": "string",
+                        "maxLength": 160
+                    },
+                    "primary_role": {
+                        "$ref": "#/components/schemas/PrimaryRoleEnum"
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
+                    },
+                    "bio": {
+                        "type": "string"
+                    },
+                    "nationality": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "tmdb_id": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": 0,
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "full_name",
+                    "id"
+                ]
+            },
             "Post": {
                 "type": "object",
                 "properties": {
@@ -6108,6 +7364,17 @@
                     "user",
                     "user_name"
                 ]
+            },
+            "PrimaryRoleEnum": {
+                "enum": [
+                    "actor",
+                    "director",
+                    "screenwriter",
+                    "dop",
+                    "producer"
+                ],
+                "type": "string",
+                "description": "* `actor` - Actor\n* `director` - Director\n* `screenwriter` - Screenwriter\n* `dop` - DOP\n* `producer` - Producer"
             },
             "Profile": {
                 "type": "object",
@@ -6470,6 +7737,10 @@
                         "type": "string",
                         "readOnly": true
                     },
+                    "movie_poster": {
+                        "type": "string",
+                        "readOnly": true
+                    },
                     "date": {
                         "type": "string",
                         "format": "date"
@@ -6481,12 +7752,26 @@
                     "hall": {
                         "type": "string",
                         "maxLength": 100
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "cinema_name": {
+                        "type": "string",
+                        "maxLength": 160
+                    },
+                    "ticket_price": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,6}(?:\\.\\d{0,2})?$"
                     }
                 },
                 "required": [
                     "date",
                     "id",
                     "movie",
+                    "movie_poster",
                     "movie_title",
                     "time"
                 ]

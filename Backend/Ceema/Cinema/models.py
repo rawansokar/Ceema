@@ -128,13 +128,133 @@ class Movie(models.Model):
     description = models.TextField()
     duration = models.PositiveIntegerField(help_text="Duration in minutes")
     genre = models.CharField(max_length=100)
-    image_url = models.URLField(blank=True)
+    language = models.CharField(max_length=80, blank=True, default="English")
+    release_year = models.PositiveIntegerField(null=True, blank=True, db_index=True)
+    country = models.CharField(max_length=80, blank=True)
+    image_url = models.URLField(max_length=500, blank=True)
+    poster_url = models.URLField(max_length=500, blank=True)
+    backdrop_url = models.URLField(max_length=500, blank=True)
+    trailer_url = models.URLField(max_length=500, blank=True)
     rating = models.DecimalField(
         max_digits=3,
         decimal_places=1,
         validators=[MinValueValidator(0), MaxValueValidator(10)],
         default=0,
     )
+    tmdb_id = models.PositiveIntegerField(null=True, blank=True, unique=True)
+    is_featured = models.BooleanField(default=False)
+    is_now_playing = models.BooleanField(default=False)
+    is_coming_soon = models.BooleanField(default=False)
+    is_in_cinemas = models.BooleanField(default=False)
+    box_office_gross_egp = models.PositiveBigIntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Person(models.Model):
+    ROLE_ACTOR = "actor"
+    ROLE_DIRECTOR = "director"
+    ROLE_SCREENWRITER = "screenwriter"
+    ROLE_DOP = "dop"
+    ROLE_PRODUCER = "producer"
+    ROLE_CHOICES = [
+        (ROLE_ACTOR, "Actor"),
+        (ROLE_DIRECTOR, "Director"),
+        (ROLE_SCREENWRITER, "Screenwriter"),
+        (ROLE_DOP, "DOP"),
+        (ROLE_PRODUCER, "Producer"),
+    ]
+
+    full_name = models.CharField(max_length=160)
+    primary_role = models.CharField(max_length=40, choices=ROLE_CHOICES, default=ROLE_ACTOR)
+    image_url = models.URLField(max_length=500, blank=True)
+    bio = models.TextField(blank=True)
+    nationality = models.CharField(max_length=80, blank=True)
+    tmdb_id = models.PositiveIntegerField(null=True, blank=True, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["full_name"]
+
+    def __str__(self):
+        return self.full_name
+
+
+class MovieCredit(models.Model):
+    JOB_ACTOR = "actor"
+    JOB_DIRECTOR = "director"
+    JOB_SCREENWRITER = "screenwriter"
+    JOB_DOP = "dop"
+    JOB_PRODUCER = "producer"
+    JOB_COMPOSER = "composer"
+    JOB_CHOICES = [
+        (JOB_ACTOR, "Actor"),
+        (JOB_DIRECTOR, "Director"),
+        (JOB_SCREENWRITER, "Screenwriter"),
+        (JOB_DOP, "DOP"),
+        (JOB_PRODUCER, "Producer"),
+        (JOB_COMPOSER, "Composer"),
+    ]
+
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="credits")
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="movie_credits")
+    job = models.CharField(max_length=40, choices=JOB_CHOICES)
+    character_name = models.CharField(max_length=160, blank=True)
+    billing_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["billing_order", "id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["movie", "person", "job", "character_name"],
+                name="unique_movie_credit",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.person.full_name} - {self.movie.title} ({self.job})"
+
+
+class NewsArticle(models.Model):
+    CATEGORY_MOVIES = "movies"
+    CATEGORY_BOX_OFFICE = "box_office"
+    CATEGORY_AWARDS = "awards"
+    CATEGORY_STREAMING = "streaming"
+    CATEGORY_TV = "tv"
+    CATEGORY_CHOICES = [
+        (CATEGORY_MOVIES, "Movies"),
+        (CATEGORY_BOX_OFFICE, "Box Office"),
+        (CATEGORY_AWARDS, "Awards"),
+        (CATEGORY_STREAMING, "Streaming"),
+        (CATEGORY_TV, "TV"),
+    ]
+
+    title = models.CharField(max_length=255)
+    summary = models.TextField()
+    body = models.TextField(blank=True)
+    image_url = models.URLField(max_length=500, blank=True)
+    source_name = models.CharField(max_length=120, blank=True)
+    source_url = models.URLField(max_length=500, blank=True)
+    category = models.CharField(
+        max_length=40, choices=CATEGORY_CHOICES, default=CATEGORY_MOVIES
+    )
+    author = models.CharField(max_length=120, blank=True)
+    published_at = models.DateTimeField(default=timezone.now)
+    is_featured = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name="news_articles",
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-is_featured", "-published_at", "-id"]
 
     def __str__(self):
         return self.title
@@ -205,9 +325,12 @@ class Showtime(models.Model):
     date = models.DateField()
     time = models.TimeField()
     hall = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True, default="Cairo")
+    cinema_name = models.CharField(max_length=160, blank=True, default="CEEMA Cinema")
+    ticket_price = models.DecimalField(max_digits=8, decimal_places=2, default=50)
 
     def __str__(self):
-        return f"{self.movie.title} on {self.date} at {self.time}"
+        return f"{self.movie.title} at {self.cinema_name} on {self.date} at {self.time}"
 
 
 class Seat(models.Model):

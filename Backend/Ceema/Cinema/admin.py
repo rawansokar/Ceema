@@ -10,7 +10,10 @@ from .models import (
     Course,
     Follow,
     Movie,
+    MovieCredit,
+    NewsArticle,
     PaymentTransaction,
+    Person,
     Post,
     PostLike,
     Profile,
@@ -33,6 +36,9 @@ admin.site.register(Badge)
 admin.site.register(Reward)
 admin.site.register(Course)
 admin.site.register(Movie)
+admin.site.register(Person)
+admin.site.register(MovieCredit)
+admin.site.register(NewsArticle)
 admin.site.register(Review)
 admin.site.register(Post)
 admin.site.register(Comment)

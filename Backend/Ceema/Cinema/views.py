@@ -2,6 +2,7 @@ import logging
 import uuid
 
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
@@ -24,7 +25,7 @@ def make_tokens(user):
 
 from .models import (
     Badge, Booking, Chatbot, ChatMessage, Comment, Course, Follow,
-    Movie, PaymentTransaction, Post, PostLike, Profile, Purchase,
+    Movie, MovieCredit, NewsArticle, PaymentTransaction, Person, Post, PostLike, Profile, Purchase,
     Recommendation, Report, Review, Reward, Seat, Showtime, Ticket, User,
 )
 from .permissions import IsAdmin, IsAdminOrReadOnly, IsOwnerOrAdmin
@@ -32,8 +33,9 @@ from .serializers import (
     BadgeSerializer, BookingCreateSerializer, BookingSerializer,
     ChatbotAnswerSerializer, ChatbotSerializer, ChatMessageSerializer,
     CommentSerializer, CourseSerializer, FollowSerializer, LoginSerializer,
-    MovieSerializer, PaymentProcessSerializer, PaymentSerializer, PostSerializer,
-    ProfileSerializer, PurchaseSerializer, RecommendationSerializer,
+    MovieCreditSerializer, MovieSerializer, NewsArticleSerializer,
+    PaymentProcessSerializer, PaymentSerializer, PersonSerializer,
+    PostSerializer, ProfileSerializer, PurchaseSerializer, RecommendationSerializer,
     RegisterSerializer, ReportSerializer, ReviewSerializer, RewardSerializer,
     SeatSerializer, ShowtimeSerializer, TicketSerializer, UserSerializer,
     UserUpdateSerializer,
@@ -194,24 +196,105 @@ class UserViewSet(viewsets.ModelViewSet):
 
 @extend_schema(tags=["movies"])
 class MovieViewSet(viewsets.ModelViewSet):
-    queryset = Movie.objects.all()
     serializer_class = MovieSerializer
 
+    def get_queryset(self):
+        qs = Movie.objects.prefetch_related("credits__person").all()
+        if getattr(self, "swagger_fake_view", False):
+            return qs.none()
+        q = self.request.query_params.get("q")
+        genre = self.request.query_params.get("genre")
+        language = self.request.query_params.get("language")
+        year = self.request.query_params.get("year") or self.request.query_params.get("release_year")
+        country = self.request.query_params.get("country")
+        city = self.request.query_params.get("city")
+        show_date = self.request.query_params.get("date")
+        min_rating = self.request.query_params.get("min_rating")
+        now_playing = self.request.query_params.get("now_playing")
+        in_cinemas = self.request.query_params.get("in_cinemas")
+        featured = self.request.query_params.get("featured")
+
+        if q:
+            qs = qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
+        if genre:
+            qs = qs.filter(genre__icontains=genre)
+        if language:
+            qs = qs.filter(language__iexact=language)
+        if year:
+            qs = qs.filter(release_year=year)
+        if country:
+            qs = qs.filter(country__iexact=country)
+        if city:
+            qs = qs.filter(showtimes__city__iexact=city)
+        if show_date:
+            qs = qs.filter(showtimes__date=show_date)
+        if min_rating:
+            qs = qs.filter(rating__gte=min_rating)
+        if now_playing is not None:
+            qs = qs.filter(is_now_playing=now_playing.lower() in {"1", "true", "yes"})
+        if in_cinemas is not None:
+            qs = qs.filter(is_in_cinemas=in_cinemas.lower() in {"1", "true", "yes"})
+        if featured is not None:
+            qs = qs.filter(is_featured=featured.lower() in {"1", "true", "yes"})
+        return qs.distinct()
+
     def get_permissions(self):
-        if self.action in ["list", "retrieve", "search"]:
+        public_actions = [
+            "list",
+            "retrieve",
+            "search",
+            "filters",
+            "featured",
+            "now_playing",
+            "in_cinemas",
+            "highest_grossing_egyptian",
+            "credits",
+        ]
+        if self.action in public_actions:
             return [AllowAny()]
         return [IsAdmin()]
 
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def search(self, request):
-        qs = Movie.objects.all()
-        q = request.query_params.get("q")
-        genre = request.query_params.get("genre")
-        if q:
-            qs = qs.filter(title__icontains=q)
-        if genre:
-            qs = qs.filter(genre__icontains=genre)
-        return Response(MovieSerializer(qs, many=True).data)
+        return Response(MovieSerializer(self.get_queryset(), many=True).data)
+
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny])
+    def filters(self, request):
+        movies = Movie.objects.all()
+        cities = Showtime.objects.exclude(city="").values_list("city", flat=True).distinct()
+        return Response(
+            {
+                "genres": sorted(set(movies.exclude(genre="").values_list("genre", flat=True))),
+                "languages": sorted(set(movies.exclude(language="").values_list("language", flat=True))),
+                "years": sorted(set(movies.exclude(release_year=None).values_list("release_year", flat=True)), reverse=True),
+                "cities": sorted(set(cities)),
+            }
+        )
+
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny])
+    def featured(self, request):
+        movies = self.get_queryset().filter(is_featured=True)
+        return Response(MovieSerializer(movies, many=True).data)
+
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path="now-playing")
+    def now_playing(self, request):
+        movies = self.get_queryset().filter(is_now_playing=True)
+        return Response(MovieSerializer(movies, many=True).data)
+
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path="in-cinemas")
+    def in_cinemas(self, request):
+        movies = self.get_queryset().filter(is_in_cinemas=True)
+        return Response(MovieSerializer(movies, many=True).data)
+
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path="highest-grossing-egyptian")
+    def highest_grossing_egyptian(self, request):
+        movies = (
+            self.get_queryset()
+            .filter(box_office_gross_egp__isnull=False)
+            .filter(Q(country__iexact="Egypt") | Q(language__iexact="Arabic"))
+            .order_by("-box_office_gross_egp")
+        )
+        return Response(MovieSerializer(movies, many=True).data)
 
     @action(detail=True, methods=["get", "post"], url_path="reviews")
     def reviews(self, request, pk=None):
@@ -229,13 +312,110 @@ class MovieViewSet(viewsets.ModelViewSet):
         movie = self.get_object()
         return Response(ShowtimeSerializer(movie.showtimes.all(), many=True).data)
 
+    @action(detail=True, methods=["get"], permission_classes=[AllowAny])
+    def credits(self, request, pk=None):
+        movie = self.get_object()
+        credits = MovieCredit.objects.select_related("person").filter(movie=movie)
+        return Response(MovieCreditSerializer(credits, many=True).data)
+
+
+@extend_schema(tags=["people"])
+class PersonViewSet(viewsets.ModelViewSet):
+    serializer_class = PersonSerializer
+
+    def get_queryset(self):
+        qs = Person.objects.all()
+        if getattr(self, "swagger_fake_view", False):
+            return qs.none()
+        q = self.request.query_params.get("q")
+        role = self.request.query_params.get("role")
+        if q:
+            qs = qs.filter(full_name__icontains=q)
+        if role:
+            qs = qs.filter(primary_role=role)
+        return qs
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve", "actors", "filmmakers"]:
+            return [AllowAny()]
+        return [IsAdmin()]
+
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny])
+    def actors(self, request):
+        people = self.get_queryset().filter(primary_role=Person.ROLE_ACTOR)
+        return Response(PersonSerializer(people, many=True).data)
+
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny])
+    def filmmakers(self, request):
+        people = self.get_queryset().exclude(primary_role=Person.ROLE_ACTOR)
+        return Response(PersonSerializer(people, many=True).data)
+
+
+# ---------- News ----------
+
+@extend_schema(tags=["news"])
+class NewsArticleViewSet(viewsets.ModelViewSet):
+    serializer_class = NewsArticleSerializer
+
+    def get_queryset(self):
+        qs = NewsArticle.objects.select_related("created_by")
+        if getattr(self, "swagger_fake_view", False):
+            return qs.none()
+        is_admin = (
+            self.request.user
+            and self.request.user.is_authenticated
+            and self.request.user.role == "admin"
+        )
+        if not is_admin:
+            qs = qs.filter(is_published=True)
+        q = self.request.query_params.get("q")
+        category = self.request.query_params.get("category")
+        featured = self.request.query_params.get("featured")
+        if q:
+            qs = qs.filter(Q(title__icontains=q) | Q(summary__icontains=q))
+        if category:
+            qs = qs.filter(category=category)
+        if featured is not None:
+            qs = qs.filter(is_featured=featured.lower() in {"1", "true", "yes"})
+        return qs.distinct()
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve", "featured"]:
+            return [AllowAny()]
+        return [IsAdmin()]
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny])
+    def featured(self, request):
+        articles = self.get_queryset().filter(is_featured=True)
+        return Response(NewsArticleSerializer(articles, many=True).data)
+
 
 # ---------- Showtimes ----------
 
 @extend_schema(tags=["showtimes"])
 class ShowtimeViewSet(viewsets.ModelViewSet):
-    queryset = Showtime.objects.select_related("movie").all()
     serializer_class = ShowtimeSerializer
+
+    def get_queryset(self):
+        qs = Showtime.objects.select_related("movie").all()
+        if getattr(self, "swagger_fake_view", False):
+            return qs.none()
+        city = self.request.query_params.get("city")
+        genre = self.request.query_params.get("genre")
+        show_date = self.request.query_params.get("date")
+        movie = self.request.query_params.get("movie")
+        if city:
+            qs = qs.filter(city__iexact=city)
+        if genre:
+            qs = qs.filter(movie__genre__icontains=genre)
+        if show_date:
+            qs = qs.filter(date=show_date)
+        if movie:
+            qs = qs.filter(movie_id=movie)
+        return qs
 
     def get_permissions(self):
         if self.action in ["list", "retrieve", "seats"]:

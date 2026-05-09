@@ -2,6 +2,7 @@ from datetime import date, time
 
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from rest_framework.test import APIClient
 
 from .models import (
     Admin,
@@ -13,7 +14,10 @@ from .models import (
     Course,
     Follow,
     Movie,
+    MovieCredit,
+    NewsArticle,
     PaymentTransaction,
+    Person,
     Post,
     PostLike,
     Profile,
@@ -185,6 +189,83 @@ class CinemaAppTests(TestCase):
         self.assertEqual(self.admin.manage_movies().count(), 1)
         self.assertGreaterEqual(self.admin.manage_users().count(), 2)
         self.assertEqual(self.admin.generate_reports().count(), 1)
+
+    def test_news_articles_are_public_and_support_filters(self):
+        NewsArticle.objects.create(
+            title="The Best Sci-Fi Movies of the 21st Century",
+            summary="Cautionary tales about technology and cinema.",
+            image_url="https://image.tmdb.org/t/p/w780/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+            category=NewsArticle.CATEGORY_MOVIES,
+            is_featured=True,
+            created_by=self.admin,
+        )
+        NewsArticle.objects.create(
+            title="Oscars Led an Overall Decline",
+            summary="Awards season ratings story.",
+            category=NewsArticle.CATEGORY_AWARDS,
+            is_published=False,
+            created_by=self.admin,
+        )
+
+        response = self.client.get("/api/news/?q=sci-fi&featured=true")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]["category"], NewsArticle.CATEGORY_MOVIES)
+
+    def test_admin_can_post_news_article(self):
+        api_client = APIClient()
+        api_client.force_authenticate(user=self.admin)
+
+        response = api_client.post(
+            "/api/news/",
+            {
+                "title": "Box Office: Project Hail Mary Opens Strong",
+                "summary": "A space epic starts with strong preview numbers.",
+                "category": NewsArticle.CATEGORY_BOX_OFFICE,
+                "image_url": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1200&q=80",
+                "is_published": True,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["created_by"], self.admin.id)
+
+    def test_movie_filters_now_playing_and_people_credits(self):
+        self.movie.language = "English"
+        self.movie.release_year = 2014
+        self.movie.country = "United States"
+        self.movie.poster_url = "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"
+        self.movie.is_now_playing = True
+        self.movie.is_in_cinemas = True
+        self.movie.save()
+        self.showtime.city = "Cairo"
+        self.showtime.cinema_name = "CEEMA Downtown"
+        self.showtime.save()
+        director = Person.objects.create(
+            full_name="Christopher Nolan",
+            primary_role=Person.ROLE_DIRECTOR,
+        )
+        MovieCredit.objects.create(
+            movie=self.movie,
+            person=director,
+            job=MovieCredit.JOB_DIRECTOR,
+        )
+
+        filters_response = self.client.get("/api/movies/filters/")
+        now_playing_response = self.client.get("/api/movies/now-playing/?city=Cairo")
+        people_response = self.client.get("/api/people/filmmakers/")
+        credits_response = self.client.get(f"/api/movies/{self.movie.id}/credits/")
+
+        self.assertEqual(filters_response.status_code, 200)
+        self.assertIn("Sci-Fi", filters_response.json()["genres"])
+        self.assertEqual(now_playing_response.status_code, 200)
+        self.assertEqual(now_playing_response.json()[0]["poster"], self.movie.poster_url)
+        self.assertEqual(people_response.status_code, 200)
+        self.assertEqual(people_response.json()[0]["full_name"], "Christopher Nolan")
+        self.assertEqual(credits_response.status_code, 200)
+        self.assertEqual(credits_response.json()[0]["job"], MovieCredit.JOB_DIRECTOR)
 
     def test_xml_extension_entities_support_demo_flow(self):
         self.user.age = 25

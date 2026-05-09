@@ -4,7 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import (
     Badge, Booking, Chatbot, ChatMessage, Comment, Course, Follow,
-    Movie, PaymentTransaction, Post, PostLike, Profile, Purchase,
+    Movie, MovieCredit, NewsArticle, PaymentTransaction, Person, Post, PostLike, Profile, Purchase,
     Recommendation, Report, Review, Reward, Seat, Showtime, Ticket,
     User, Admin,
 )
@@ -107,10 +107,109 @@ class FollowSerializer(serializers.ModelSerializer):
 
 # ---------- Movie ----------
 
+class PersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = [
+            "id",
+            "full_name",
+            "primary_role",
+            "image_url",
+            "bio",
+            "nationality",
+            "tmdb_id",
+            "created_at",
+        ]
+
+
+class MovieCreditSerializer(serializers.ModelSerializer):
+    person = PersonSerializer(read_only=True)
+    person_id = serializers.PrimaryKeyRelatedField(
+        source="person",
+        queryset=Person.objects.all(),
+        write_only=True,
+        required=False,
+    )
+
+    class Meta:
+        model = MovieCredit
+        fields = [
+            "id",
+            "movie",
+            "person",
+            "person_id",
+            "job",
+            "character_name",
+            "billing_order",
+        ]
+        extra_kwargs = {"movie": {"read_only": True}}
+
+
 class MovieSerializer(serializers.ModelSerializer):
+    poster = serializers.SerializerMethodField()
+    wide_poster_url = serializers.SerializerMethodField()
+    credits = MovieCreditSerializer(many=True, read_only=True)
+
+    def get_poster(self, obj) -> str:
+        return obj.poster_url or obj.image_url
+
+    def get_wide_poster_url(self, obj) -> str:
+        return obj.backdrop_url
+
     class Meta:
         model = Movie
-        fields = ["id", "title", "description", "duration", "genre", "image_url", "rating"]
+        fields = [
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genre",
+            "language",
+            "release_year",
+            "country",
+            "image_url",
+            "poster_url",
+            "poster",
+            "wide_poster_url",
+            "backdrop_url",
+            "trailer_url",
+            "rating",
+            "tmdb_id",
+            "is_featured",
+            "is_now_playing",
+            "is_coming_soon",
+            "is_in_cinemas",
+            "box_office_gross_egp",
+            "credits",
+        ]
+
+
+# ---------- News ----------
+
+class NewsArticleSerializer(serializers.ModelSerializer):
+    created_by_name = serializers.CharField(source="created_by.name", read_only=True)
+
+    class Meta:
+        model = NewsArticle
+        fields = [
+            "id",
+            "title",
+            "summary",
+            "body",
+            "image_url",
+            "source_name",
+            "source_url",
+            "category",
+            "author",
+            "published_at",
+            "is_featured",
+            "is_published",
+            "created_by",
+            "created_by_name",
+            "created_at",
+            "updated_at",
+        ]
+        extra_kwargs = {"created_by": {"read_only": True}}
 
 
 # ---------- Review ----------
@@ -148,10 +247,25 @@ class SeatSerializer(serializers.ModelSerializer):
 
 class ShowtimeSerializer(serializers.ModelSerializer):
     movie_title = serializers.CharField(source="movie.title", read_only=True)
+    movie_poster = serializers.SerializerMethodField()
+
+    def get_movie_poster(self, obj) -> str:
+        return obj.movie.poster_url or obj.movie.image_url
 
     class Meta:
         model = Showtime
-        fields = ["id", "movie", "movie_title", "date", "time", "hall"]
+        fields = [
+            "id",
+            "movie",
+            "movie_title",
+            "movie_poster",
+            "date",
+            "time",
+            "hall",
+            "city",
+            "cinema_name",
+            "ticket_price",
+        ]
 
 
 # ---------- Booking & Ticket ----------

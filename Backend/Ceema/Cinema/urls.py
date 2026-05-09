@@ -7,6 +7,8 @@ from . import views
 router = DefaultRouter()
 router.register(r"users", views.UserViewSet, basename="user")
 router.register(r"movies", views.MovieViewSet, basename="movie")
+router.register(r"people", views.PersonViewSet, basename="person")
+router.register(r"news", views.NewsArticleViewSet, basename="news")
 router.register(r"showtimes", views.ShowtimeViewSet, basename="showtime")
 router.register(r"seats", views.SeatViewSet, basename="seat")
 router.register(r"bookings", views.BookingViewSet, basename="booking")
