@@ -843,6 +843,72 @@ class PaymentViewSet(viewsets.ModelViewSet):
         return Response(PaymentSerializer(payment).data, status=status.HTTP_201_CREATED)
 
 
+def chatbot_movie_queryset(answer, mood):
+    lowered = answer.lower()
+    qs = Movie.objects.prefetch_related("showtimes").all()
+
+    matching_title_ids = [
+        movie.id
+        for movie in Movie.objects.only("id", "title")
+        if movie.title.lower() in lowered
+    ]
+    if matching_title_ids:
+        return Movie.objects.filter(id__in=matching_title_ids)
+
+    if any(word in lowered for word in ["highest", "grossing", "box office", "egyptian films"]):
+        return (
+            qs.filter(box_office_gross_egp__isnull=False)
+            .order_by("-box_office_gross_egp", "-rating")
+        )
+
+    if any(word in lowered for word in ["now playing", "cinema", "cinemas", "ticket", "tickets"]):
+        qs = qs.filter(is_in_cinemas=True)
+
+    if any(word in lowered for word in ["arabic", "egyptian", "egypt", "عربي", "مصري"]):
+        qs = qs.filter(Q(language__iexact="Arabic") | Q(country__iexact="Egypt"))
+    elif "english" in lowered:
+        qs = qs.filter(language__iexact="English")
+    elif "korean" in lowered:
+        qs = qs.filter(language__iexact="Korean")
+    elif "french" in lowered:
+        qs = qs.filter(language__iexact="French")
+
+    for city in ["cairo", "giza", "alexandria"]:
+        if city in lowered:
+            qs = qs.filter(showtimes__city__iexact=city)
+            break
+
+    if any(word in lowered for word in ["sci-fi", "sci fi", "science fiction", "space"]):
+        qs = qs.filter(genre__icontains="Sci-Fi")
+    elif any(word in lowered for word in ["horror", "scary", "scared"]):
+        qs = qs.filter(genre__icontains="Horror")
+    elif any(word in lowered for word in ["romance", "romantic"]):
+        qs = qs.filter(genre__icontains="Romance")
+    elif any(word in lowered for word in ["animation", "kids", "family"]):
+        qs = qs.filter(Q(genre__icontains="Animation") | Q(genre__icontains="Comedy"))
+    elif mood == "happy":
+        qs = qs.filter(Q(genre__icontains="Comedy") | Q(genre__icontains="Animation"))
+    elif mood == "emotional":
+        qs = qs.filter(Q(genre__icontains="Drama") | Q(genre__icontains="Romance"))
+    elif mood == "thriller":
+        qs = qs.filter(Q(genre__icontains="Thriller") | Q(genre__icontains="Horror"))
+    elif mood == "action":
+        qs = qs.filter(Q(genre__icontains="Action") | Q(genre__icontains="Sci-Fi"))
+
+    qs = qs.distinct().order_by("-is_now_playing", "-is_in_cinemas", "-rating", "title")
+    if not qs.exists():
+        qs = Movie.objects.order_by("-rating", "title")
+    return qs
+
+
+def chatbot_recommendation_message(movies):
+    selected = list(movies[:5])
+    if not selected:
+        return "I could not find matching movies yet, but the catalog is ready for more seed data."
+    titles = ", ".join(movie.title for movie in selected)
+    return f"I found these from the CEEMA catalog: {titles}."
+
+
 @extend_schema(tags=["chatbot"])
 class ChatbotViewSet(viewsets.ModelViewSet):
     serializer_class = ChatbotSerializer
@@ -882,9 +948,10 @@ class ChatbotViewSet(viewsets.ModelViewSet):
             sender=ChatMessage.SENDER_USER,
         )
         mood = chatbot.receive_answer(answer)
+        recommendations = chatbot_movie_queryset(answer, mood)
         ChatMessage.objects.create(
             chatbot=chatbot,
-            content=f"Detected mood: {mood}",
+            content=f"Detected mood: {mood}. {chatbot_recommendation_message(recommendations)}",
             sender=ChatMessage.SENDER_BOT,
         )
         return Response(ChatbotSerializer(chatbot).data)
@@ -892,15 +959,6 @@ class ChatbotViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["get"], url_path="recommend-movies")
     def recommend_movies(self, request, pk=None):
         chatbot = self.get_object()
-        qs = Movie.objects.all()
-        if chatbot.current_mood in {"happy"}:
-            qs = qs.filter(genre__icontains="comedy")
-        elif chatbot.current_mood in {"emotional"}:
-            qs = qs.filter(genre__icontains="drama")
-        elif chatbot.current_mood in {"thriller"}:
-            qs = qs.filter(genre__icontains="thriller")
-        elif chatbot.current_mood in {"action"}:
-            qs = qs.filter(genre__icontains="action")
-        if not qs.exists():
-            qs = Movie.objects.order_by("-rating")[:5]
-        return Response(MovieSerializer(qs, many=True).data)
+        answer = request.query_params.get("q", "")
+        qs = chatbot_movie_queryset(answer, chatbot.current_mood)
+        return Response(MovieSerializer(qs[:10], many=True).data)

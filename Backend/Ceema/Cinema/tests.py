@@ -321,3 +321,41 @@ class CinemaAppTests(TestCase):
 
         self.assertEqual(mood, "action")
         self.assertEqual(chatbot.messages.count(), 1)
+
+    def test_chatbot_recommends_from_current_movie_catalog(self):
+        bershama = Movie.objects.create(
+            title="Bershama",
+            description="Egyptian comedy now playing.",
+            duration=105,
+            genre="Comedy",
+            language="Arabic",
+            country="Egypt",
+            release_year=2026,
+            is_in_cinemas=True,
+            is_now_playing=True,
+            rating=6.8,
+        )
+        Showtime.objects.create(
+            movie=bershama,
+            date=date(2026, 5, 10),
+            time=time(20, 0),
+            city="Cairo",
+            cinema_name="CEEMA Downtown",
+        )
+        chatbot = Chatbot.objects.create(user=self.user)
+        api_client = APIClient()
+        api_client.force_authenticate(user=self.user)
+
+        response = api_client.post(
+            f"/api/chatbot/{chatbot.id}/receive-answer/",
+            {"answer": "I want an Arabic comedy in Cairo cinema"},
+            format="json",
+        )
+        recommendations_response = api_client.get(
+            f"/api/chatbot/{chatbot.id}/recommend-movies/?q=Arabic comedy Cairo cinema"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Bershama", response.json()["messages"][-1]["content"])
+        self.assertEqual(recommendations_response.status_code, 200)
+        self.assertEqual(recommendations_response.json()[0]["title"], "Bershama")
