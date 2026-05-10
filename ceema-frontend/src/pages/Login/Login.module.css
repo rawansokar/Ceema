@@ -1,0 +1,190 @@
+.loginPage {
+  min-height: calc(100vh - var(--navbar-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-lg);
+  background-color: var(--color-bg);
+}
+
+/* ─── Card ─── */
+.loginCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl) var(--space-xl);
+  width: 100%;
+  max-width: 480px;
+}
+
+/* ─── Title ─── */
+.title {
+  font-family: var(--font-main);
+  font-size: var(--text-3xl);
+  color: var(--color-text);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: var(--space-xl);
+}
+
+/* ─── General Error ─── */
+.generalError {
+  background-color: var(--color-primary-light);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+  text-align: center;
+}
+
+/* ─── Form ─── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* ─── Input ─── */
+.input {
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  padding: 10px 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+/* ─── Login Button ─── */
+.loginBtn {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: var(--font-main);
+  font-size: var(--text-lg);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  margin-top: var(--space-sm);
+  align-self: flex-end;
+  min-width: 140px;
+}
+
+.loginBtn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-red);
+}
+
+.loginBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ─── Social Section ─── */
+.socialSection {
+  margin-top: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.orText {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.socialIcons {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.socialBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.socialBtn:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  transform: translateY(-2px);
+}
+
+/* ─── Register Link ─── */
+.registerLink {
+  margin-top: var(--space-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.registerLink a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.registerLink a:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 520px) {
+
+  .loginCard {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+
+  .loginBtn {
+    align-self: stretch;
+  }
+
+  .registerLink {
+    text-align: center;
+  }
+
+}

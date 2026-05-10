@@ -1,0 +1,111 @@
+.page {
+  min-height: 100vh;
+  background: #050505;
+  color: #fff;
+  padding: 56px clamp(20px, 7vw, 120px) 96px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 54px;
+}
+
+.header h1 {
+  margin: 0;
+  font-family: var(--font-main);
+  font-size: clamp(32px, 4vw, 52px);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.header p {
+  margin: 10px 0 22px;
+  color: #e00000;
+  font-size: 20px;
+  letter-spacing: 0.12em;
+}
+
+.pointsPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  padding: 10px 18px;
+  border: 1px solid #8b0000;
+  border-radius: 6px;
+  background: #141414;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 64px min(15vw, 160px);
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
+.card {
+  min-height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 24px;
+  background: #141414;
+  border: 1px solid #222;
+  border-radius: 8px;
+  box-shadow: 0 6px 0 rgba(255, 255, 255, 0.06);
+}
+
+.card h2 {
+  margin: 0 0 22px;
+  max-width: 260px;
+  font-size: 22px;
+  line-height: 1.18;
+  letter-spacing: 0.08em;
+}
+
+.card p {
+  margin: 0 0 12px;
+  color: #e5e5e5;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.redeemBtn {
+  border: 0;
+  border-radius: 6px;
+  background: #b00000;
+  color: #fff;
+  padding: 8px 13px;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+}
+
+.redeemBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.icon {
+  flex: 0 0 auto;
+  width: 92px;
+  height: 92px;
+  color: #8d0909;
+}
+
+.empty {
+  color: #ddd;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}

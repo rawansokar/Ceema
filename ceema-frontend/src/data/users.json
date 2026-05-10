@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Katerina Petrova",
+    "username": "@katerinaP",
+    "email": "katerina@ceema.com",
+    "password": "password123",
+    "avatar": "https://i.pravatar.cc/150?img=47",
+    "bio": "I'm a visual storyteller with a passion for photography and filmmaking. I'm drawn to quiet moments, strong emotions, and the details that often go unnoticed.",
+    "likes": 2900,
+    "followers": 1700,
+    "friends": 320,
+    "claps": 120,
+    "role": "user",
+    "portfolio": [
+      {
+        "id": 1,
+        "poster": "https://image.tmdb.org/t/p/w500/ppd84D2i9W8jXmsyInGyihiAkbs.jpg",
+        "title": "12 Angry Men"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Admin User",
+    "username": "@admin",
+    "email": "admin@ceema.com",
+    "password": "admin123",
+    "avatar": "https://i.pravatar.cc/150?img=12",
+    "bio": "CEEMA Platform Administrator",
+    "likes": 0,
+    "followers": 0,
+    "friends": 0,
+    "claps": 0,
+    "role": "admin",
+    "portfolio": []
+  }
+]

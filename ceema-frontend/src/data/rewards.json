@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "Large Popcorn & Soda Drink Combo",
+    "claps": 500,
+    "icon": "🍿",
+    "category": "Food & Drinks"
+  },
+  {
+    "id": 2,
+    "title": "Free Movie Ticket (your choice)",
+    "claps": 1000,
+    "icon": "🎬",
+    "category": "Tickets"
+  },
+  {
+    "id": 3,
+    "title": "Private Movie Screening",
+    "claps": 5000,
+    "icon": "🎭",
+    "category": "Experience"
+  },
+  {
+    "id": 4,
+    "title": "Meet your Favorite Celebrity",
+    "claps": 7500,
+    "icon": "⭐",
+    "category": "Experience"
+  },
+  {
+    "id": 5,
+    "title": "Attend the Next Film Festival",
+    "claps": 15000,
+    "icon": "🏆",
+    "category": "Events"
+  },
+  {
+    "id": 6,
+    "title": "Online Filmmaking Course",
+    "claps": 40000,
+    "icon": "🎥",
+    "category": "Education"
+  }
+]

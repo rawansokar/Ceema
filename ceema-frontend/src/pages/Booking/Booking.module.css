@@ -1,0 +1,141 @@
+.bookingPage {
+  min-height: 100vh;
+  background: #0f0f0f;
+  padding: 60px 20px;
+  color: white;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  text-align: center;
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.pageSubtitle {
+  text-align: center;
+  color: #b0b0b0;
+  margin-bottom: 60px;
+  font-size: 16px;
+}
+
+.cinemasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+}
+
+.cinemaCard {
+  position: relative;
+  background: #181818;
+  border: 1px solid #2a2a2a;
+  border-radius: 24px;
+  padding: 40px 24px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cinemaCard:hover {
+  transform: translateY(-6px);
+  border-color: #cc0000;
+}
+
+.cinemaCardHovered {
+  transform: translateY(-6px);
+  border-color: #cc0000;
+}
+
+.cardGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(204, 0, 0, 0.15) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: 0.3s ease;
+}
+
+.cinemaCard:hover .cardGlow {
+  opacity: 1;
+}
+
+
+
+.cinemaLogoWrap {
+  width: 200px;
+  height: 200px;
+  border-radius: 28px;
+  background: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+
+.cinemaLogo {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+}
+.cinemaName {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.cinemaLocation {
+  color: #b0b0b0;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.cinemaScreens {
+  color: #888888;
+  margin-bottom: 28px;
+  font-size: 14px;
+}
+
+.selectIndicator {
+  margin-top: auto;
+  background: #cc0000;
+  color: white;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+.cinemaCard:hover .selectIndicator {
+  background: #ff1a1a;
+}
+
+@media (max-width: 768px) {
+  .pageTitle {
+    font-size: 32px;
+  }
+
+  .cinemaLogoWrap {
+    width: 110px;
+    height: 110px;
+  }
+
+  .cinemaName {
+    font-size: 20px;
+  }
+}
+

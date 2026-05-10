@@ -2,11 +2,17 @@ openapi: 3.0.3
 info:
   title: CEEMA API
   version: 1.0.0
-  description: Cinema platform API — movies, bookings, tickets, social features.
+  description: |-
+    Cinema platform API — movies, bookings, tickets, and social features.
+
+    **Authentication:** Most endpoints require a JWT access token. Get one by calling `POST /api/auth/login/`, then click the green **Authorize** button at the top right and paste the `access` token.
+
+    **Sample users (password = `ceema123`):** `alice@ceema.com` (admin), `sara@ceema.com`, `omar@ceema.com`, `rawan@ceema.com`.
 paths:
   /api/admin/reports/:
     get:
       operationId: admin_reports_list
+      summary: List all reports (admin only)
       tags:
       - admin
       security:
@@ -23,6 +29,7 @@ paths:
           description: ''
     post:
       operationId: admin_reports_create
+      summary: Submit a new report (admin only)
       tags:
       - admin
       requestBody:
@@ -49,6 +56,7 @@ paths:
   /api/admin/reports/{id}/:
     get:
       operationId: admin_reports_retrieve
+      summary: Get a report by ID (admin only)
       parameters:
       - in: path
         name: id
@@ -70,6 +78,7 @@ paths:
           description: ''
     put:
       operationId: admin_reports_update
+      summary: Replace a report (admin only)
       parameters:
       - in: path
         name: id
@@ -102,6 +111,7 @@ paths:
           description: ''
     patch:
       operationId: admin_reports_partial_update
+      summary: Update some fields of a report (admin only)
       parameters:
       - in: path
         name: id
@@ -134,6 +144,7 @@ paths:
           description: ''
     delete:
       operationId: admin_reports_destroy
+      summary: Delete a report (admin only)
       parameters:
       - in: path
         name: id
@@ -152,6 +163,7 @@ paths:
   /api/admin/reports/{id}/review/:
     post:
       operationId: admin_reports_review_create
+      summary: Mark a report as reviewed (admin)
       parameters:
       - in: path
         name: id
@@ -165,13 +177,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Report'
+              $ref: '#/components/schemas/ReportReviewRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Report'
+              $ref: '#/components/schemas/ReportReviewRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Report'
+              $ref: '#/components/schemas/ReportReviewRequest'
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -185,6 +197,7 @@ paths:
   /api/admin/users/:
     get:
       operationId: admin_users_list
+      summary: List all users with admin filters (admin only)
       tags:
       - admin
       security:
@@ -201,6 +214,7 @@ paths:
           description: ''
     post:
       operationId: admin_users_create
+      summary: Create a new user as admin
       tags:
       - admin
       requestBody:
@@ -228,6 +242,7 @@ paths:
   /api/admin/users/{id}/:
     get:
       operationId: admin_users_retrieve
+      summary: Get any user by ID (admin only)
       parameters:
       - in: path
         name: id
@@ -249,6 +264,7 @@ paths:
           description: ''
     put:
       operationId: admin_users_update
+      summary: Replace user info (admin only)
       parameters:
       - in: path
         name: id
@@ -282,6 +298,7 @@ paths:
           description: ''
     patch:
       operationId: admin_users_partial_update
+      summary: Update some user fields (admin only)
       parameters:
       - in: path
         name: id
@@ -314,6 +331,7 @@ paths:
           description: ''
     delete:
       operationId: admin_users_destroy
+      summary: Delete a user (admin only)
       parameters:
       - in: path
         name: id
@@ -332,6 +350,7 @@ paths:
   /api/admin/users/{id}/ban/:
     post:
       operationId: admin_users_ban_create
+      summary: Ban this user (admin only)
       parameters:
       - in: path
         name: id
@@ -341,18 +360,6 @@ paths:
         required: true
       tags:
       - admin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -366,6 +373,7 @@ paths:
   /api/admin/users/{id}/unban/:
     post:
       operationId: admin_users_unban_create
+      summary: Unban this user (admin only)
       parameters:
       - in: path
         name: id
@@ -375,18 +383,6 @@ paths:
         required: true
       tags:
       - admin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -400,6 +396,9 @@ paths:
   /api/admin/users/statistics/:
     get:
       operationId: admin_users_statistics_retrieve
+      description: Returns counts of users, movies, showtimes, bookings, tickets,
+        posts, open reports, and paid payments.
+      summary: Platform statistics dashboard (admin only)
       tags:
       - admin
       security:
@@ -410,7 +409,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/AdminStatistics'
           description: ''
   /api/auth/login/:
     post:
@@ -463,6 +462,7 @@ paths:
       description: |-
         Takes a refresh type JSON web token and returns an access type JSON web
         token if the refresh token is valid.
+      summary: Get a fresh access token from a refresh token
       tags:
       - auth
       requestBody:
@@ -518,6 +518,7 @@ paths:
   /api/badges/:
     get:
       operationId: badges_list
+      summary: List all available badges
       tags:
       - badges & rewards
       security:
@@ -535,6 +536,7 @@ paths:
   /api/badges/{id}/:
     get:
       operationId: badges_retrieve
+      summary: Get a badge by ID
       parameters:
       - in: path
         name: id
@@ -557,6 +559,7 @@ paths:
   /api/bookings/:
     get:
       operationId: bookings_list
+      summary: List your bookings (admins see all)
       tags:
       - bookings
       security:
@@ -573,6 +576,7 @@ paths:
           description: ''
     post:
       operationId: bookings_create
+      summary: Book a showtime — pick seats and pay
       tags:
       - bookings
       requestBody:
@@ -600,6 +604,7 @@ paths:
   /api/bookings/{id}/:
     get:
       operationId: bookings_retrieve
+      summary: Get one of your bookings
       parameters:
       - in: path
         name: id
@@ -621,6 +626,7 @@ paths:
           description: ''
     put:
       operationId: bookings_update
+      summary: Replace a booking
       parameters:
       - in: path
         name: id
@@ -654,6 +660,7 @@ paths:
           description: ''
     patch:
       operationId: bookings_partial_update
+      summary: Update some fields of a booking
       parameters:
       - in: path
         name: id
@@ -686,6 +693,7 @@ paths:
           description: ''
     delete:
       operationId: bookings_destroy
+      summary: Delete a booking
       parameters:
       - in: path
         name: id
@@ -704,6 +712,7 @@ paths:
   /api/bookings/{id}/cancel/:
     post:
       operationId: bookings_cancel_create
+      summary: Cancel this booking
       parameters:
       - in: path
         name: id
@@ -713,18 +722,6 @@ paths:
         required: true
       tags:
       - bookings
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Booking'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Booking'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Booking'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -738,6 +735,7 @@ paths:
   /api/bookings/{id}/tickets/:
     get:
       operationId: bookings_tickets_retrieve
+      summary: List all tickets in this booking
       parameters:
       - in: path
         name: id
@@ -760,6 +758,7 @@ paths:
   /api/chatbot/:
     get:
       operationId: chatbot_list
+      summary: List your chatbot sessions
       tags:
       - chatbot
       security:
@@ -776,6 +775,7 @@ paths:
           description: ''
     post:
       operationId: chatbot_create
+      summary: Start a new chatbot session
       tags:
       - chatbot
       requestBody:
@@ -802,6 +802,7 @@ paths:
   /api/chatbot/{id}/:
     get:
       operationId: chatbot_retrieve
+      summary: Get a chatbot session by ID
       parameters:
       - in: path
         name: id
@@ -823,6 +824,7 @@ paths:
           description: ''
     put:
       operationId: chatbot_update
+      summary: Replace a chatbot session
       parameters:
       - in: path
         name: id
@@ -855,6 +857,7 @@ paths:
           description: ''
     patch:
       operationId: chatbot_partial_update
+      summary: Update some fields of a chatbot session
       parameters:
       - in: path
         name: id
@@ -887,6 +890,7 @@ paths:
           description: ''
     delete:
       operationId: chatbot_destroy
+      summary: End/delete a chatbot session
       parameters:
       - in: path
         name: id
@@ -905,6 +909,7 @@ paths:
   /api/chatbot/{id}/ask-mood-question/:
     post:
       operationId: chatbot_ask_mood_question_create
+      summary: Bot asks user a mood question
       parameters:
       - in: path
         name: id
@@ -914,17 +919,6 @@ paths:
         required: true
       tags:
       - chatbot
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Chatbot'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Chatbot'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Chatbot'
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -938,6 +932,9 @@ paths:
   /api/chatbot/{id}/receive-answer/:
     post:
       operationId: chatbot_receive_answer_create
+      description: Detects mood from the answer and returns updated chatbot state
+        with movie recommendations.
+      summary: Send the user's answer to the chatbot
       parameters:
       - in: path
         name: id
@@ -971,7 +968,8 @@ paths:
           description: ''
   /api/chatbot/{id}/recommend-movies/:
     get:
-      operationId: chatbot_recommend_movies_retrieve
+      operationId: chatbot_recommend_movies_list
+      summary: Get movie recommendations based on mood
       parameters:
       - in: path
         name: id
@@ -979,6 +977,11 @@ paths:
           type: integer
         description: A unique integer value identifying this chatbot.
         required: true
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: User's mood or query text
       tags:
       - chatbot
       security:
@@ -989,11 +992,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Chatbot'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
           description: ''
   /api/courses/:
     get:
       operationId: courses_list
+      summary: List all film courses
       tags:
       - courses
       security:
@@ -1010,6 +1016,7 @@ paths:
           description: ''
     post:
       operationId: courses_create
+      summary: Create a new course (admin only)
       tags:
       - courses
       requestBody:
@@ -1037,6 +1044,7 @@ paths:
   /api/courses/{id}/:
     get:
       operationId: courses_retrieve
+      summary: Get a course by ID
       parameters:
       - in: path
         name: id
@@ -1058,6 +1066,7 @@ paths:
           description: ''
     put:
       operationId: courses_update
+      summary: Replace a course (admin only)
       parameters:
       - in: path
         name: id
@@ -1091,6 +1100,7 @@ paths:
           description: ''
     patch:
       operationId: courses_partial_update
+      summary: Update some fields of a course (admin only)
       parameters:
       - in: path
         name: id
@@ -1123,6 +1133,7 @@ paths:
           description: ''
     delete:
       operationId: courses_destroy
+      summary: Delete a course (admin only)
       parameters:
       - in: path
         name: id
@@ -1141,6 +1152,7 @@ paths:
   /api/courses/{id}/enroll/:
     post:
       operationId: courses_enroll_create
+      summary: Enroll the current user in this course
       parameters:
       - in: path
         name: id
@@ -1150,18 +1162,6 @@ paths:
         required: true
       tags:
       - courses
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Course'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Course'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Course'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -1175,6 +1175,7 @@ paths:
   /api/courses/{id}/unenroll/:
     post:
       operationId: courses_unenroll_create
+      summary: Unenroll the current user from this course
       parameters:
       - in: path
         name: id
@@ -1184,18 +1185,6 @@ paths:
         required: true
       tags:
       - courses
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Course'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Course'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Course'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -1209,6 +1198,64 @@ paths:
   /api/movies/:
     get:
       operationId: movies_list
+      summary: List movies (with optional filters)
+      parameters:
+      - in: query
+        name: city
+        schema:
+          type: string
+        description: Filter by showtime city
+      - in: query
+        name: country
+        schema:
+          type: string
+        description: Filter by country
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+        description: Filter by showtime date (YYYY-MM-DD)
+      - in: query
+        name: featured
+        schema:
+          type: boolean
+        description: Only featured movies
+      - in: query
+        name: genre
+        schema:
+          type: string
+        description: Filter by genre (e.g. Sci-Fi, Action)
+      - in: query
+        name: in_cinemas
+        schema:
+          type: boolean
+        description: Only movies in cinemas
+      - in: query
+        name: language
+        schema:
+          type: string
+        description: Filter by language (e.g. English, Arabic)
+      - in: query
+        name: min_rating
+        schema:
+          type: number
+        description: Minimum rating (0–10)
+      - in: query
+        name: now_playing
+        schema:
+          type: boolean
+        description: Only currently-playing movies
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Search by title or description (case-insensitive)
+      - in: query
+        name: year
+        schema:
+          type: integer
+        description: Filter by release year
       tags:
       - movies
       security:
@@ -1226,6 +1273,7 @@ paths:
           description: ''
     post:
       operationId: movies_create
+      summary: Create a new movie (admin only)
       tags:
       - movies
       requestBody:
@@ -1253,6 +1301,7 @@ paths:
   /api/movies/{id}/:
     get:
       operationId: movies_retrieve
+      summary: Get a single movie by ID
       parameters:
       - in: path
         name: id
@@ -1275,6 +1324,7 @@ paths:
           description: ''
     put:
       operationId: movies_update
+      summary: Replace a movie (admin only)
       parameters:
       - in: path
         name: id
@@ -1308,6 +1358,7 @@ paths:
           description: ''
     patch:
       operationId: movies_partial_update
+      summary: Update some fields of a movie (admin only)
       parameters:
       - in: path
         name: id
@@ -1340,6 +1391,7 @@ paths:
           description: ''
     delete:
       operationId: movies_destroy
+      summary: Delete a movie (admin only)
       parameters:
       - in: path
         name: id
@@ -1358,6 +1410,7 @@ paths:
   /api/movies/{id}/credits/:
     get:
       operationId: movies_credits_retrieve
+      summary: List cast & crew credits for this movie
       parameters:
       - in: path
         name: id
@@ -1380,7 +1433,8 @@ paths:
           description: ''
   /api/movies/{id}/reviews/:
     get:
-      operationId: movies_reviews_retrieve
+      operationId: movies_reviews_list
+      summary: List reviews for this movie
       parameters:
       - in: path
         name: id
@@ -1398,10 +1452,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movie'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
           description: ''
     post:
       operationId: movies_reviews_create
+      summary: Add a review for this movie
       parameters:
       - in: path
         name: id
@@ -1415,27 +1472,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Movie'
+              $ref: '#/components/schemas/Review'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Movie'
+              $ref: '#/components/schemas/Review'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Movie'
+              $ref: '#/components/schemas/Review'
         required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movie'
+                $ref: '#/components/schemas/Review'
           description: ''
   /api/movies/{id}/showtimes/:
     get:
       operationId: movies_showtimes_retrieve
+      summary: List all showtimes for this movie
       parameters:
       - in: path
         name: id
@@ -1458,6 +1516,7 @@ paths:
   /api/movies/featured/:
     get:
       operationId: movies_featured_retrieve
+      summary: List featured/highlighted movies
       tags:
       - movies
       security:
@@ -1474,6 +1533,9 @@ paths:
   /api/movies/filters/:
     get:
       operationId: movies_filters_retrieve
+      description: Returns lists of all unique genres, languages, release years, and
+        showtime cities so the front-end can populate dropdowns.
+      summary: Get available filter values (genres, languages, years, cities)
       tags:
       - movies
       security:
@@ -1485,11 +1547,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movie'
+                $ref: '#/components/schemas/FilterOptions'
           description: ''
   /api/movies/highest-grossing-egyptian/:
     get:
       operationId: movies_highest_grossing_egyptian_retrieve
+      summary: Top-grossing Egyptian/Arabic movies (ranked by box office in EGP)
       tags:
       - movies
       security:
@@ -1506,6 +1569,7 @@ paths:
   /api/movies/in-cinemas/:
     get:
       operationId: movies_in_cinemas_retrieve
+      summary: List movies still showing in cinemas
       tags:
       - movies
       security:
@@ -1522,6 +1586,7 @@ paths:
   /api/movies/now-playing/:
     get:
       operationId: movies_now_playing_retrieve
+      summary: List movies currently playing
       tags:
       - movies
       security:
@@ -1538,6 +1603,64 @@ paths:
   /api/movies/search/:
     get:
       operationId: movies_search_retrieve
+      summary: Search & filter movies
+      parameters:
+      - in: query
+        name: city
+        schema:
+          type: string
+        description: Filter by showtime city
+      - in: query
+        name: country
+        schema:
+          type: string
+        description: Filter by country
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+        description: Filter by showtime date (YYYY-MM-DD)
+      - in: query
+        name: featured
+        schema:
+          type: boolean
+        description: Only featured movies
+      - in: query
+        name: genre
+        schema:
+          type: string
+        description: Filter by genre (e.g. Sci-Fi, Action)
+      - in: query
+        name: in_cinemas
+        schema:
+          type: boolean
+        description: Only movies in cinemas
+      - in: query
+        name: language
+        schema:
+          type: string
+        description: Filter by language (e.g. English, Arabic)
+      - in: query
+        name: min_rating
+        schema:
+          type: number
+        description: Minimum rating (0–10)
+      - in: query
+        name: now_playing
+        schema:
+          type: boolean
+        description: Only currently-playing movies
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Search by title or description (case-insensitive)
+      - in: query
+        name: year
+        schema:
+          type: integer
+        description: Filter by release year
       tags:
       - movies
       security:
@@ -1554,6 +1677,23 @@ paths:
   /api/news/:
     get:
       operationId: news_list
+      summary: List news articles (with optional filters)
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: 'Filter by category: movies, box_office, awards, streaming, tv'
+      - in: query
+        name: featured
+        schema:
+          type: boolean
+        description: Only featured articles
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Search by title or summary
       tags:
       - news
       security:
@@ -1571,6 +1711,7 @@ paths:
           description: ''
     post:
       operationId: news_create
+      summary: Publish a new news article (admin only)
       tags:
       - news
       requestBody:
@@ -1598,6 +1739,7 @@ paths:
   /api/news/{id}/:
     get:
       operationId: news_retrieve
+      summary: Get a news article by ID
       parameters:
       - in: path
         name: id
@@ -1620,6 +1762,7 @@ paths:
           description: ''
     put:
       operationId: news_update
+      summary: Replace a news article (admin only)
       parameters:
       - in: path
         name: id
@@ -1653,6 +1796,7 @@ paths:
           description: ''
     patch:
       operationId: news_partial_update
+      summary: Update some fields of a news article (admin only)
       parameters:
       - in: path
         name: id
@@ -1685,6 +1829,7 @@ paths:
           description: ''
     delete:
       operationId: news_destroy
+      summary: Delete a news article (admin only)
       parameters:
       - in: path
         name: id
@@ -1703,6 +1848,7 @@ paths:
   /api/news/featured/:
     get:
       operationId: news_featured_retrieve
+      summary: List only featured news articles
       tags:
       - news
       security:
@@ -1719,6 +1865,7 @@ paths:
   /api/payments/:
     get:
       operationId: payments_list
+      summary: List payments
       tags:
       - payments
       security:
@@ -1735,6 +1882,7 @@ paths:
           description: ''
     post:
       operationId: payments_create
+      summary: Record a new payment
       tags:
       - payments
       requestBody:
@@ -1762,6 +1910,7 @@ paths:
   /api/payments/{id}/:
     get:
       operationId: payments_retrieve
+      summary: Get a payment by ID
       parameters:
       - in: path
         name: id
@@ -1783,6 +1932,7 @@ paths:
           description: ''
     put:
       operationId: payments_update
+      summary: Replace a payment record
       parameters:
       - in: path
         name: id
@@ -1816,6 +1966,7 @@ paths:
           description: ''
     patch:
       operationId: payments_partial_update
+      summary: Update some fields of a payment
       parameters:
       - in: path
         name: id
@@ -1848,6 +1999,7 @@ paths:
           description: ''
     delete:
       operationId: payments_destroy
+      summary: Delete a payment
       parameters:
       - in: path
         name: id
@@ -1866,6 +2018,7 @@ paths:
   /api/payments/mock-process/:
     post:
       operationId: payments_mock_process_create
+      summary: Mock payment processing for a booking
       tags:
       - payments
       requestBody:
@@ -1893,6 +2046,19 @@ paths:
   /api/people/:
     get:
       operationId: people_list
+      summary: List people (with optional filters)
+      parameters:
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Search by full name
+      - in: query
+        name: role
+        schema:
+          type: string
+        description: 'Filter by primary role: actor, director, screenwriter, dop,
+          producer'
       tags:
       - people
       security:
@@ -1910,6 +2076,7 @@ paths:
           description: ''
     post:
       operationId: people_create
+      summary: Create a new person (admin only)
       tags:
       - people
       requestBody:
@@ -1937,6 +2104,7 @@ paths:
   /api/people/{id}/:
     get:
       operationId: people_retrieve
+      summary: Get a person by ID
       parameters:
       - in: path
         name: id
@@ -1959,6 +2127,7 @@ paths:
           description: ''
     put:
       operationId: people_update
+      summary: Replace a person (admin only)
       parameters:
       - in: path
         name: id
@@ -1992,6 +2161,7 @@ paths:
           description: ''
     patch:
       operationId: people_partial_update
+      summary: Update some fields of a person (admin only)
       parameters:
       - in: path
         name: id
@@ -2024,6 +2194,7 @@ paths:
           description: ''
     delete:
       operationId: people_destroy
+      summary: Delete a person (admin only)
       parameters:
       - in: path
         name: id
@@ -2042,6 +2213,7 @@ paths:
   /api/people/actors/:
     get:
       operationId: people_actors_retrieve
+      summary: List only actors
       tags:
       - people
       security:
@@ -2058,6 +2230,7 @@ paths:
   /api/people/filmmakers/:
     get:
       operationId: people_filmmakers_retrieve
+      summary: List only filmmakers (directors, writers, DOPs, producers)
       tags:
       - people
       security:
@@ -2074,11 +2247,13 @@ paths:
   /api/posts/:
     get:
       operationId: posts_list
+      summary: List all social posts (newest first)
       tags:
       - posts
       security:
       - BearerAuth: []
       - BearerAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -2090,6 +2265,7 @@ paths:
           description: ''
     post:
       operationId: posts_create
+      summary: Create a new social post
       tags:
       - posts
       requestBody:
@@ -2117,6 +2293,7 @@ paths:
   /api/posts/{id}/:
     get:
       operationId: posts_retrieve
+      summary: Get a post by ID
       parameters:
       - in: path
         name: id
@@ -2129,6 +2306,7 @@ paths:
       security:
       - BearerAuth: []
       - BearerAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -2138,6 +2316,7 @@ paths:
           description: ''
     put:
       operationId: posts_update
+      summary: Replace your post
       parameters:
       - in: path
         name: id
@@ -2171,6 +2350,7 @@ paths:
           description: ''
     patch:
       operationId: posts_partial_update
+      summary: Update some fields of your post
       parameters:
       - in: path
         name: id
@@ -2203,6 +2383,7 @@ paths:
           description: ''
     delete:
       operationId: posts_destroy
+      summary: Delete your post
       parameters:
       - in: path
         name: id
@@ -2220,7 +2401,8 @@ paths:
           description: No response body
   /api/posts/{id}/comments/:
     get:
-      operationId: posts_comments_retrieve
+      operationId: posts_comments_list
+      summary: List comments on this post
       parameters:
       - in: path
         name: id
@@ -2233,15 +2415,19 @@ paths:
       security:
       - BearerAuth: []
       - BearerAuth: []
+      - {}
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
           description: ''
     post:
       operationId: posts_comments_create
+      summary: Add a comment to this post
       parameters:
       - in: path
         name: id
@@ -2255,27 +2441,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Post'
+              $ref: '#/components/schemas/Comment'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Post'
+              $ref: '#/components/schemas/Comment'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Post'
+              $ref: '#/components/schemas/Comment'
         required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
+                $ref: '#/components/schemas/Comment'
           description: ''
   /api/posts/{id}/like/:
     post:
       operationId: posts_like_create
+      summary: Toggle like on this post
       parameters:
       - in: path
         name: id
@@ -2285,18 +2472,6 @@ paths:
         required: true
       tags:
       - posts
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Post'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Post'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Post'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -2310,6 +2485,7 @@ paths:
   /api/posts/{id}/share/:
     post:
       operationId: posts_share_create
+      summary: Share this post
       parameters:
       - in: path
         name: id
@@ -2319,18 +2495,6 @@ paths:
         required: true
       tags:
       - posts
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Post'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Post'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Post'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -2344,6 +2508,7 @@ paths:
   /api/purchases/:
     get:
       operationId: purchases_list
+      summary: List your purchase history
       tags:
       - purchases
       security:
@@ -2361,6 +2526,7 @@ paths:
   /api/purchases/{id}/:
     get:
       operationId: purchases_retrieve
+      summary: Get a single purchase by ID
       parameters:
       - in: path
         name: id
@@ -2383,6 +2549,7 @@ paths:
   /api/recommendations/:
     get:
       operationId: recommendations_list
+      summary: List your personalised movie recommendations
       tags:
       - recommendations
       security:
@@ -2400,6 +2567,7 @@ paths:
   /api/recommendations/{id}/:
     get:
       operationId: recommendations_retrieve
+      summary: Get a single recommendation by ID
       parameters:
       - in: path
         name: id
@@ -2422,6 +2590,7 @@ paths:
   /api/reviews/:
     get:
       operationId: reviews_list
+      summary: List all reviews
       tags:
       - reviews
       security:
@@ -2438,6 +2607,7 @@ paths:
           description: ''
     post:
       operationId: reviews_create
+      summary: Write a new review
       tags:
       - reviews
       requestBody:
@@ -2465,6 +2635,7 @@ paths:
   /api/reviews/{id}/:
     get:
       operationId: reviews_retrieve
+      summary: Get a review by ID
       parameters:
       - in: path
         name: id
@@ -2486,6 +2657,7 @@ paths:
           description: ''
     put:
       operationId: reviews_update
+      summary: Replace your review
       parameters:
       - in: path
         name: id
@@ -2519,6 +2691,7 @@ paths:
           description: ''
     patch:
       operationId: reviews_partial_update
+      summary: Update some fields of your review
       parameters:
       - in: path
         name: id
@@ -2551,6 +2724,7 @@ paths:
           description: ''
     delete:
       operationId: reviews_destroy
+      summary: Delete your review
       parameters:
       - in: path
         name: id
@@ -2569,6 +2743,7 @@ paths:
   /api/rewards/:
     get:
       operationId: rewards_list
+      summary: List all available rewards
       tags:
       - badges & rewards
       security:
@@ -2586,6 +2761,7 @@ paths:
   /api/rewards/{id}/:
     get:
       operationId: rewards_retrieve
+      summary: Get a reward by ID
       parameters:
       - in: path
         name: id
@@ -2608,6 +2784,7 @@ paths:
   /api/rewards/{id}/redeem/:
     post:
       operationId: rewards_redeem_create
+      summary: Redeem this reward using your points
       parameters:
       - in: path
         name: id
@@ -2617,18 +2794,6 @@ paths:
         required: true
       tags:
       - badges & rewards
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Reward'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Reward'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Reward'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -2642,6 +2807,7 @@ paths:
   /api/seats/:
     get:
       operationId: seats_list
+      summary: List all seats
       tags:
       - seats
       security:
@@ -2659,6 +2825,7 @@ paths:
           description: ''
     post:
       operationId: seats_create
+      summary: Create a new seat (admin only)
       tags:
       - seats
       requestBody:
@@ -2686,6 +2853,7 @@ paths:
   /api/seats/{id}/:
     get:
       operationId: seats_retrieve
+      summary: Get a seat by ID
       parameters:
       - in: path
         name: id
@@ -2708,6 +2876,7 @@ paths:
           description: ''
     put:
       operationId: seats_update
+      summary: Replace a seat (admin only)
       parameters:
       - in: path
         name: id
@@ -2741,6 +2910,7 @@ paths:
           description: ''
     patch:
       operationId: seats_partial_update
+      summary: Update some fields of a seat (admin only)
       parameters:
       - in: path
         name: id
@@ -2773,6 +2943,7 @@ paths:
           description: ''
     delete:
       operationId: seats_destroy
+      summary: Delete a seat (admin only)
       parameters:
       - in: path
         name: id
@@ -2791,6 +2962,7 @@ paths:
   /api/seats/{id}/release/:
     post:
       operationId: seats_release_create
+      summary: Release a reserved seat
       parameters:
       - in: path
         name: id
@@ -2800,18 +2972,6 @@ paths:
         required: true
       tags:
       - seats
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Seat'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Seat'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Seat'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -2825,6 +2985,7 @@ paths:
   /api/seats/{id}/reserve/:
     post:
       operationId: seats_reserve_create
+      summary: Reserve this seat
       parameters:
       - in: path
         name: id
@@ -2834,18 +2995,6 @@ paths:
         required: true
       tags:
       - seats
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Seat'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Seat'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Seat'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -2859,6 +3008,29 @@ paths:
   /api/showtimes/:
     get:
       operationId: showtimes_list
+      summary: List showtimes (with optional filters)
+      parameters:
+      - in: query
+        name: city
+        schema:
+          type: string
+        description: Filter by city
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+        description: Filter by showtime date (YYYY-MM-DD)
+      - in: query
+        name: genre
+        schema:
+          type: string
+        description: Filter by movie genre
+      - in: query
+        name: movie
+        schema:
+          type: integer
+        description: Filter by movie ID
       tags:
       - showtimes
       security:
@@ -2876,6 +3048,7 @@ paths:
           description: ''
     post:
       operationId: showtimes_create
+      summary: Schedule a new showtime (admin only)
       tags:
       - showtimes
       requestBody:
@@ -2903,6 +3076,7 @@ paths:
   /api/showtimes/{id}/:
     get:
       operationId: showtimes_retrieve
+      summary: Get a showtime by ID
       parameters:
       - in: path
         name: id
@@ -2925,6 +3099,7 @@ paths:
           description: ''
     put:
       operationId: showtimes_update
+      summary: Replace a showtime (admin only)
       parameters:
       - in: path
         name: id
@@ -2958,6 +3133,7 @@ paths:
           description: ''
     patch:
       operationId: showtimes_partial_update
+      summary: Update some fields of a showtime (admin only)
       parameters:
       - in: path
         name: id
@@ -2990,6 +3166,7 @@ paths:
           description: ''
     delete:
       operationId: showtimes_destroy
+      summary: Delete a showtime (admin only)
       parameters:
       - in: path
         name: id
@@ -3008,6 +3185,7 @@ paths:
   /api/showtimes/{id}/seats/:
     get:
       operationId: showtimes_seats_retrieve
+      summary: List all seats for this showtime (with availability status)
       parameters:
       - in: path
         name: id
@@ -3031,6 +3209,7 @@ paths:
   /api/tickets/:
     get:
       operationId: tickets_list
+      summary: List all your tickets
       tags:
       - tickets
       security:
@@ -3048,6 +3227,7 @@ paths:
   /api/tickets/{id}/:
     get:
       operationId: tickets_retrieve
+      summary: Get a ticket by ID
       parameters:
       - in: path
         name: id
@@ -3070,6 +3250,7 @@ paths:
   /api/users/:
     get:
       operationId: users_list
+      summary: List all users (admin only)
       tags:
       - users
       security:
@@ -3086,6 +3267,7 @@ paths:
           description: ''
     post:
       operationId: users_create
+      summary: Create a user (use /api/auth/register/ instead for self-signup)
       tags:
       - users
       requestBody:
@@ -3113,6 +3295,7 @@ paths:
   /api/users/{id}/:
     get:
       operationId: users_retrieve
+      summary: Get a user by ID
       parameters:
       - in: path
         name: id
@@ -3134,6 +3317,7 @@ paths:
           description: ''
     put:
       operationId: users_update
+      summary: Replace user info (owner or admin)
       parameters:
       - in: path
         name: id
@@ -3167,6 +3351,7 @@ paths:
           description: ''
     patch:
       operationId: users_partial_update
+      summary: Update some user fields (owner or admin)
       parameters:
       - in: path
         name: id
@@ -3199,6 +3384,7 @@ paths:
           description: ''
     delete:
       operationId: users_destroy
+      summary: Delete a user (admin only)
       parameters:
       - in: path
         name: id
@@ -3217,6 +3403,7 @@ paths:
   /api/users/{id}/follow/:
     post:
       operationId: users_follow_create
+      summary: Follow this user
       parameters:
       - in: path
         name: id
@@ -3226,18 +3413,6 @@ paths:
         required: true
       tags:
       - users
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -3251,6 +3426,7 @@ paths:
   /api/users/{id}/followers/:
     get:
       operationId: users_followers_retrieve
+      summary: List users who follow this user
       parameters:
       - in: path
         name: id
@@ -3273,6 +3449,7 @@ paths:
   /api/users/{id}/following/:
     get:
       operationId: users_following_retrieve
+      summary: List users that this user follows
       parameters:
       - in: path
         name: id
@@ -3295,6 +3472,7 @@ paths:
   /api/users/{id}/profile/:
     get:
       operationId: users_profile_retrieve
+      summary: Get or update this user's profile (bio, avatar, etc.)
       parameters:
       - in: path
         name: id
@@ -3316,6 +3494,7 @@ paths:
           description: ''
     put:
       operationId: users_profile_update
+      summary: Get or update this user's profile (bio, avatar, etc.)
       parameters:
       - in: path
         name: id
@@ -3349,6 +3528,7 @@ paths:
           description: ''
     patch:
       operationId: users_profile_partial_update
+      summary: Get or update this user's profile (bio, avatar, etc.)
       parameters:
       - in: path
         name: id
@@ -3382,6 +3562,7 @@ paths:
   /api/users/{id}/unfollow/:
     post:
       operationId: users_unfollow_create
+      summary: Unfollow this user
       parameters:
       - in: path
         name: id
@@ -3391,18 +3572,6 @@ paths:
         required: true
       tags:
       - users
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
       security:
       - BearerAuth: []
       - BearerAuth: []
@@ -3415,6 +3584,34 @@ paths:
           description: ''
 components:
   schemas:
+    AdminStatistics:
+      type: object
+      properties:
+        users:
+          type: integer
+        movies:
+          type: integer
+        showtimes:
+          type: integer
+        bookings:
+          type: integer
+        tickets:
+          type: integer
+        posts:
+          type: integer
+        reports_open:
+          type: integer
+        payments_paid:
+          type: integer
+      required:
+      - bookings
+      - movies
+      - payments_paid
+      - posts
+      - reports_open
+      - showtimes
+      - tickets
+      - users
     Badge:
       type: object
       properties:
@@ -3481,6 +3678,10 @@ components:
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
           default: '50.00'
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
       required:
       - seat_ids
       - showtime_id
@@ -3572,6 +3773,34 @@ components:
           type: string
       required:
       - answer
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        post:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - content
+      - created_at
+      - id
+      - post
+      - user
+      - user_name
     Course:
       type: object
       properties:
@@ -3595,6 +3824,30 @@ components:
       - enrolled_count
       - id
       - title
+    FilterOptions:
+      type: object
+      properties:
+        genres:
+          type: array
+          items:
+            type: string
+        languages:
+          type: array
+          items:
+            type: string
+        years:
+          type: array
+          items:
+            type: integer
+        cities:
+          type: array
+          items:
+            type: string
+      required:
+      - cities
+      - genres
+      - languages
+      - years
     JobEnum:
       enum:
       - actor
@@ -4610,6 +4863,14 @@ components:
       - created_at
       - generated_at
       - id
+    ReportReviewRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          description: e.g. reviewed, dismissed
+        reason:
+          type: string
     ReportStatusEnum:
       enum:
       - open
@@ -4913,3 +5174,40 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+tags:
+- name: auth
+  description: Register, login, logout, refresh JWT tokens.
+- name: users
+  description: User accounts, profiles, follow/unfollow.
+- name: movies
+  description: Browse, filter, and review movies.
+- name: people
+  description: Actors, directors, and other film crew.
+- name: news
+  description: Cinema news articles & announcements.
+- name: showtimes
+  description: Movie screenings at specific times/cities.
+- name: seats
+  description: Reserve and release individual seats.
+- name: bookings
+  description: Create, cancel, and view your bookings.
+- name: tickets
+  description: Tickets generated from confirmed bookings.
+- name: posts
+  description: Social posts, likes, comments, shares.
+- name: courses
+  description: Educational film courses users can enroll in.
+- name: reviews
+  description: User reviews on movies.
+- name: badges & rewards
+  description: Earn badges and redeem points for rewards.
+- name: recommendations
+  description: Personalised movie recommendations.
+- name: purchases
+  description: Purchase history (read-only).
+- name: payments
+  description: Mock payment processing for bookings.
+- name: chatbot
+  description: Mood-based movie recommendation chatbot.
+- name: admin
+  description: 'Admin-only endpoints: reports, user management, statistics.'

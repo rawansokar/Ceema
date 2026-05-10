@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "name": "Scene Cinemas",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/scene_cinemas_logo.png",
+    "location": "Cairo Festival City",
+    "screens": [
+      {
+        "id": "sc1",
+        "name": "Standard",
+        "showtimes": ["8:00 pm", "9:30 pm", "11:00 pm", "12:30 am"]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "VOX Cinemas",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/vox_cinemas_logo.png",
+    "location": "Mall of Arabia",
+    "screens": [
+      {
+        "id": "vox1",
+        "name": "Standard",
+        "showtimes": ["7:00 pm", "9:00 pm", "11:00 pm"]
+      },
+      {
+        "id": "vox2",
+        "name": "IMAX",
+        "showtimes": ["8:00 pm", "10:30 pm"]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Renaissance Cinemas",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/renaissance_cinemas_logo.png",
+    "location": "Citystars",
+    "screens": [
+      {
+        "id": "ren1",
+        "name": "Standard",
+        "showtimes": ["6:30 pm", "8:30 pm", "10:30 pm"]
+      }
+    ]
+  }
+]

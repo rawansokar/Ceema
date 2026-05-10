@@ -1,0 +1,86 @@
+[
+  {
+    "id": 101,
+    "title": "Bershama",
+    "titleAr": "برشامة",
+    "genre": ["Comedy"],
+    "language": "Arabic",
+    "poster": "https://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Bershama_poster.jpg/220px-Bershama_poster.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/bershama_backdrop.jpg",
+    "synopsis": "In a high school exam, the supervisor dies mid-test, and the students try to hide it hoping to cheat. Only problem? Nobody knows the answers.",
+    "releaseDate": "April 2, 2025",
+    "featured": true
+  },
+  {
+    "id": 102,
+    "title": "EGY BEST",
+    "titleAr": "إيجي بيست",
+    "genre": ["Action", "Comedy"],
+    "language": "Arabic",
+    "poster": "https://image.tmdb.org/t/p/w500/egybest_poster.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/egybest_backdrop.jpg",
+    "synopsis": "A thrilling action comedy set in the streets of Cairo.",
+    "releaseDate": "April 2, 2025",
+    "featured": false
+  },
+  {
+    "id": 103,
+    "title": "Scream 7",
+    "titleAr": "صرخة 7",
+    "genre": ["Horror", "Thriller"],
+    "language": "English",
+    "poster": "https://image.tmdb.org/t/p/w500/scream7_poster.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/scream7_backdrop.jpg",
+    "synopsis": "The iconic Ghostface killer returns for another round of terror.",
+    "releaseDate": "April 2, 2025",
+    "featured": false
+  },
+  {
+    "id": 104,
+    "title": "Family Business",
+    "titleAr": "عمل عيلة",
+    "genre": ["Comedy", "Drama"],
+    "language": "Arabic",
+    "poster": "https://image.tmdb.org/t/p/w500/familybusiness_poster.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/familybusiness_backdrop.jpg",
+    "synopsis": "A family comedy about running a business together.",
+    "releaseDate": "April 2, 2025",
+    "featured": false
+  },
+  {
+    "id": 105,
+    "title": "Project Hail Mary",
+    "titleAr": "مشروع هيل ماري",
+    "genre": ["Sci-Fi", "Adventure"],
+    "language": "English",
+    "poster": "https://image.tmdb.org/t/p/w500/projecthailmary_poster.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/projecthailmary_backdrop.jpg",
+    "synopsis": "A lone astronaut must save Earth from disaster.",
+    "releaseDate": "April 2, 2025",
+    "featured": false
+  },
+  {
+    "id": 106,
+    "title": "Hoppers",
+    "titleAr": "هوبرز",
+    "genre": ["Animation", "Family"],
+    "language": "English",
+    "poster": "https://image.tmdb.org/t/p/w500/hoppers_poster.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/hoppers_backdrop.jpg",
+    "synopsis": "An animated adventure about a brave little creature.",
+    "releaseDate": "April 2, 2025",
+    "featured": false
+  },
+  {
+    "id": 107,
+    "title": "Reminders of Him",
+    "titleAr": "ذكرياته",
+    "genre": ["Drama", "Romance"],
+    "language": "English",
+    "poster": "https://image.tmdb.org/t/p/w500/remindersofhim_poster.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/remindersofhim_backdrop.jpg",
+    "synopsis": "A mother tries to rebuild her life and reconnect with her daughter.",
+    "releaseDate": "April 2, 2025",
+    "featured": false
+  }
+]

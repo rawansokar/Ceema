@@ -1,0 +1,201 @@
+/* ─────────────────────────────────────────
+   Bootstrap Overrides — CEEMA Theme
+   These override Bootstrap defaults to match
+   the black/red/white design system
+───────────────────────────────────────── */
+
+/* ─── Buttons ─── */
+.btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: #ffffff !important;
+  font-family: var(--font-main);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
+  box-shadow: var(--shadow-red) !important;
+}
+
+.btn-outline-primary {
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-primary) !important;
+  color: #ffffff !important;
+}
+
+/* ─── Forms ─── */
+.form-control {
+  background-color: var(--color-surface-2) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.form-control::placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+.form-control:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px var(--color-primary-light) !important;
+  background-color: var(--color-surface-2) !important;
+  color: var(--color-text) !important;
+}
+
+.form-label {
+  color: var(--color-text) !important;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-select {
+  background-color: var(--color-surface-2) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.form-select:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px var(--color-primary-light) !important;
+}
+
+/* ─── Cards ─── */
+.card {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--color-text) !important;
+}
+
+.card-body {
+  color: var(--color-text) !important;
+}
+
+/* ─── Navbar ─── */
+.navbar {
+  background-color: var(--color-bg) !important;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-link {
+  color: var(--color-text) !important;
+  transition: color var(--transition-fast);
+}
+
+.nav-link:hover {
+  color: var(--color-primary) !important;
+}
+
+/* ─── Tables ─── */
+.table {
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+.table thead th {
+  background-color: var(--color-surface-2) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+  text-transform: uppercase;
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
+}
+
+.table tbody tr {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-surface-2) !important;
+}
+
+/* ─── Badges ─── */
+.badge.bg-danger {
+  background-color: var(--color-primary) !important;
+}
+
+/* ─── Modal ─── */
+.modal-content {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--color-border) !important;
+}
+
+/* ─── Dropdown ─── */
+.dropdown-menu {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.dropdown-item {
+  color: var(--color-text) !important;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-surface-2) !important;
+  color: var(--color-primary) !important;
+}
+
+/* ─── Pagination ─── */
+.page-link {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+.page-link:hover {
+  background-color: var(--color-primary) !important;
+  color: #ffffff !important;
+}
+
+.page-item.active .page-link {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* ─── Alerts ─── */
+.alert-danger {
+  background-color: var(--color-primary-light) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-text) !important;
+}
+
+/* ─── Radio & Checkbox ─── */
+.form-check-input:checked {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.form-check-label {
+  color: var(--color-text) !important;
+}
+
+/* ─── Container max width ─── */
+.container,
+.container-lg,
+.container-xl {
+  max-width: var(--max-width) !important;
+}

@@ -182,6 +182,24 @@ class CinemaAppTests(TestCase):
 
         self.assertEqual(self.user.points, 25)
 
+    def test_booking_create_accepts_exact_total_price(self):
+        api_client = APIClient()
+        api_client.force_authenticate(user=self.user)
+
+        response = api_client.post(
+            "/api/bookings/",
+            {
+                "showtime_id": self.showtime.id,
+                "seat_ids": [self.seat.id],
+                "price_per_seat": "600.00",
+                "total_price": "700.00",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["total_price"], "700.00")
+
     def test_admin_helper_methods_expose_management_targets(self):
         Report.objects.create(admin=self.admin)
 
@@ -212,6 +230,37 @@ class CinemaAppTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.json()[0]["category"], NewsArticle.CATEGORY_MOVIES)
+
+    def test_posts_are_public_read_but_writes_require_auth(self):
+        Post.objects.create(user=self.user, content="A public feed post.")
+
+        list_response = self.client.get("/api/posts/")
+        create_response = self.client.post(
+            "/api/posts/",
+            {"content": "Anonymous post should fail."},
+            content_type="application/json",
+        )
+
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(list_response.json()[0]["content"], "A public feed post.")
+        self.assertEqual(create_response.status_code, 401)
+
+    def test_user_can_update_own_profile_bio_and_portfolio(self):
+        api_client = APIClient()
+        api_client.force_authenticate(user=self.user)
+
+        response = api_client.patch(
+            f"/api/users/{self.user.id}/profile/",
+            {
+                "bio": "Updated filmmaker bio",
+                "portfolio": ["data:image/png;base64,abc"],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["bio"], "Updated filmmaker bio")
+        self.assertEqual(response.json()["portfolio"], ["data:image/png;base64,abc"])
 
     def test_admin_can_post_news_article(self):
         api_client = APIClient()

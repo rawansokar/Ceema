@@ -1,0 +1,378 @@
+.profilePage {
+  min-height: calc(100vh - var(--navbar-height));
+  background-color: var(--color-bg);
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+/* ─── Page Title ─── */
+.pageTitle {
+  font-family: var(--font-main);
+  font-size: var(--text-3xl);
+  color: var(--color-primary);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin: 0;
+}
+
+/* ─── Avatar Section ─── */
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 3px solid var(--color-primary);
+}
+
+.userName {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.editProfileBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+}
+
+.editProfileBtn:hover {
+  color: var(--color-primary);
+}
+
+/* ─── Edit Card ─── */
+.editCard {
+  width: 100%;
+  max-width: 480px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* ─── Label with char count ─── */
+.editLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.charCount {
+  color: var(--color-text-subtle);
+  font-weight: 400;
+  text-transform: none;
+}
+
+/* ─── Inputs ─── */
+.editInput {
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+  width: 100%;
+}
+
+.editInput:focus {
+  border-color: var(--color-primary);
+}
+
+/* ─── Bio Textarea ─── */
+.editTextarea {
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  padding: 8px 12px;
+  outline: none;
+  resize: vertical;
+  width: 100%;
+  line-height: 1.6;
+  transition: border-color var(--transition-fast);
+}
+
+.editTextarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.editTextarea:focus {
+  border-color: var(--color-primary);
+}
+
+.inputError {
+  border-color: var(--color-primary) !important;
+}
+
+.errorMsg {
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+}
+
+.editActions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.saveBtn {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 24px;
+  font-family: var(--font-main);
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.saveBtn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.saveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background: none;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 20px;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.cancelBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+/* ─── Stats Row ─── */
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3xl);
+  width: 100%;
+  max-width: 600px;
+}
+
+.statBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.statLabel {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.statNumber {
+  font-family: var(--font-body);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.statDivider {
+  width: 1px;
+  height: 40px;
+  background-color: var(--color-border);
+}
+
+/* ─── Bottom 4-column Grid ─── */
+.bottomGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xl);
+  width: 100%;
+  margin-top: var(--space-md);
+}
+
+
+.gridBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+
+
+.ticketsBlock {
+  align-items: center;
+}
+
+.blockTitle {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.blockTitleLink {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.blockTitleLink:hover {
+  color: var(--color-primary-hover);
+}
+
+/* ─── Bio Text ─── */
+.bioText {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ─── Portfolio ─── */
+.portfolioGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.portfolioImg {
+  width: 70px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.portfolioAdd {
+  width: 70px;
+  height: 100px;
+  background-color: var(--color-surface-2);
+  border: 1px dashed var(--color-border-light);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: var(--text-2xl);
+  color: var(--color-text-muted);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.portfolioAdd:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ─── Tickets History ─── */
+/* .ticketsWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md) 0;
+} */
+
+.ticketsWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100px;
+  align-self: stretch;
+}
+
+.fileInput {
+  display: none;
+}
+
+.ticketIcon {
+  color: #ffffff;
+}
+
+.pointsText {
+  font-size: var(--text-xl);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.pointsText strong {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .bottomGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .statsRow {
+    gap: var(--space-xl);
+  }
+
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+}

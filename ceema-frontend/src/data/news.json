@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "title": "Box Office: 'Project Hail Mary' Rockets to Gravity-defying $50M in Preview",
+    "category": "Box Office",
+    "date": "March 20, 2026",
+    "image": "https://image.tmdb.org/t/p/w500/projecthailmary_backdrop.jpg",
+    "excerpt": "Ryan Gosling's latest sci-fi adventure smashes box office expectations in its opening weekend preview screenings."
+  },
+  {
+    "id": 2,
+    "title": "The Josh Safdie-Directed Dune ping pong film features Timothée Chalamet and Gwyneth Paltrow",
+    "category": "Industry News",
+    "date": "March 18, 2026",
+    "image": "https://image.tmdb.org/t/p/w500/dune_news.jpg",
+    "excerpt": "The acclaimed director duo behind Uncut Gems is back with an unexpected sports drama set in the world of professional ping pong."
+  },
+  {
+    "id": 3,
+    "title": "'Neighbors' Lands Season 2 Renewal at HBO",
+    "category": "TV News",
+    "date": "March 15, 2026",
+    "image": "https://image.tmdb.org/t/p/w500/neighbors_hbo.jpg",
+    "excerpt": "The critically acclaimed drama series gets a second season greenlight after strong viewership numbers."
+  },
+  {
+    "id": 4,
+    "title": "The Best Sci-Fi Movies of the 21st Century That Predicted Our Troubling Times",
+    "category": "Features",
+    "date": "March 12, 2026",
+    "image": "https://image.tmdb.org/t/p/w500/scifi_feature.jpg",
+    "excerpt": "From Minority Report to Don't Look Up, these films saw the future coming and weren't afraid to say so."
+  },
+  {
+    "id": 5,
+    "title": "Peaky Blinders was a 2010s phenomenon that hinged on three core elements",
+    "category": "Features",
+    "date": "March 10, 2026",
+    "image": "https://image.tmdb.org/t/p/w500/peaky_blinders.jpg",
+    "excerpt": "A look back at what made the Birmingham gang drama an international sensation."
+  },
+  {
+    "id": 6,
+    "title": "Shogun had an Overall Rating in the 90s During its Ratings Run, With One Exception",
+    "category": "TV News",
+    "date": "March 8, 2026",
+    "image": "https://image.tmdb.org/t/p/w500/shogun_ratings.jpg",
+    "excerpt": "The FX epic samurai drama maintained exceptional viewer scores throughout its historic run."
+  },
+  {
+    "id": 7,
+    "title": "Tom Holland in 'Spider-Man: Brand New Day'",
+    "category": "Marvel",
+    "date": "March 5, 2026",
+    "image": "https://image.tmdb.org/t/p/w500/spiderman_new_day.jpg",
+    "excerpt": "First look images from the highly anticipated fourth Spider-Man film have finally arrived."
+  }
+]

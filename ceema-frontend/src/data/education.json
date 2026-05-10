@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "title": "Introduction to DaVinci Resolve for Video Editing",
+    "category": "Video Editing",
+    "instructor": "Omar Khalid",
+    "lessons": 12,
+    "duration": "4 hours",
+    "downloads": 2341,
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/DaVinci_Resolve_17_logo.svg/512px-DaVinci_Resolve_17_logo.svg.png",
+    "level": "Beginner"
+  },
+  {
+    "id": 2,
+    "title": "Cinematography Ideas for Short Documentary Film Work",
+    "category": "Cinematography",
+    "instructor": "Sara Ahmed",
+    "lessons": 8,
+    "duration": "3 hours",
+    "downloads": 1870,
+    "image": "https://image.tmdb.org/t/p/w500/cinematography_course.jpg",
+    "level": "Intermediate"
+  },
+  {
+    "id": 3,
+    "title": "iPhone Cinematography & Videography for Social Media",
+    "category": "Mobile Filmmaking",
+    "instructor": "Karim Nasser",
+    "lessons": 10,
+    "duration": "2h 30m",
+    "downloads": 3200,
+    "image": "https://image.tmdb.org/t/p/w500/iphone_cinema.jpg",
+    "level": "Beginner"
+  },
+  {
+    "id": 4,
+    "title": "Introduction to Video Music Narration",
+    "category": "Sound Design",
+    "instructor": "Layla Hassan",
+    "lessons": 6,
+    "duration": "2 hours",
+    "downloads": 980,
+    "image": "https://image.tmdb.org/t/p/w500/music_narration.jpg",
+    "level": "Beginner"
+  },
+  {
+    "id": 5,
+    "title": "Advanced Street Photography Techniques",
+    "category": "Photography",
+    "instructor": "Youssef Adel",
+    "lessons": 15,
+    "duration": "5h 20m",
+    "downloads": 2100,
+    "image": "https://image.tmdb.org/t/p/w500/street_photography.jpg",
+    "level": "Advanced"
+  },
+  {
+    "id": 6,
+    "title": "Introduction to Film Collection",
+    "category": "Film Studies",
+    "instructor": "Nadia Farouk",
+    "lessons": 20,
+    "duration": "6 hours",
+    "downloads": 1540,
+    "image": "https://image.tmdb.org/t/p/w500/film_collection.jpg",
+    "level": "Intermediate"
+  },
+  {
+    "id": 7,
+    "title": "Costume Design for Film and TV",
+    "category": "Production Design",
+    "instructor": "Rania Mostafa",
+    "lessons": 11,
+    "duration": "3h 45m",
+    "downloads": 876,
+    "image": "https://image.tmdb.org/t/p/w500/costume_design.jpg",
+    "level": "Intermediate"
+  },
+  {
+    "id": 8,
+    "title": "Screenwriting for Feature Short Films",
+    "category": "Screenwriting",
+    "instructor": "Ahmed Samy",
+    "lessons": 18,
+    "duration": "5 hours",
+    "downloads": 2780,
+    "image": "https://image.tmdb.org/t/p/w500/screenwriting.jpg",
+    "level": "Advanced"
+  }
+]

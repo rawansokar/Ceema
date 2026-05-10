@@ -309,6 +309,7 @@ class BookingCreateSerializer(serializers.Serializer):
     showtime_id = serializers.IntegerField()
     seat_ids = serializers.ListField(child=serializers.IntegerField(), min_length=1)
     price_per_seat = serializers.DecimalField(max_digits=6, decimal_places=2, default=50)
+    total_price = serializers.DecimalField(max_digits=8, decimal_places=2, required=False)
 
     def validate_showtime_id(self, value):
         if not Showtime.objects.filter(id=value).exists():
@@ -322,6 +323,8 @@ class BookingCreateSerializer(serializers.Serializer):
         unavailable = seats.exclude(status="available")
         if unavailable.exists():
             raise serializers.ValidationError("One or more seats are not available.")
+        if data.get("total_price") is not None and data["total_price"] <= 0:
+            raise serializers.ValidationError("Total price must be greater than zero.")
         data["seats"] = seats
         return data
 

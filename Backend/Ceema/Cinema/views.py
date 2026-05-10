@@ -136,7 +136,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == "list":
             return [IsAdmin()]
-        if self.action in ["retrieve", "update", "partial_update"]:
+        if self.action in ["retrieve", "update", "partial_update", "profile"]:
             return [IsOwnerOrAdmin()]
         if self.action == "destroy":
             return [IsAdmin()]
@@ -616,7 +616,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 
         showtime = Showtime.objects.get(id=data["showtime_id"])
         seats = data["seats"]
-        total = data["price_per_seat"] * len(seats)
+        total = data.get("total_price") or (data["price_per_seat"] * len(seats))
 
         with transaction.atomic():
             booking = Booking.objects.create(
@@ -732,6 +732,10 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [AllowAny()]
+        if self.action == "comments" and self.request.method == "GET":
+            return [AllowAny()]
         if self.action in ["destroy", "update", "partial_update"]:
             return [IsOwnerOrAdmin()]
         return [IsAuthenticated()]

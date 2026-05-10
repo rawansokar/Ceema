@@ -1,0 +1,267 @@
+.paymentPage {
+  min-height: calc(100vh - var(--navbar-height));
+  background-color: var(--color-bg);
+  padding: var(--space-2xl) var(--space-lg);
+}
+ 
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+ 
+/* ─── Title ─── */
+.pageTitle {
+  font-family: var(--font-main);
+  font-size: var(--text-3xl);
+  color: var(--color-text);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: var(--space-2xl);
+}
+ 
+/* ─── Grid Layout ─── */
+.paymentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  align-items: start;
+}
+ 
+/* ─── Cards ─── */
+.paymentCard,
+.summaryCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+ 
+.cardTitle {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+ 
+/* ─── Radio Options ─── */
+.radioOption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+}
+ 
+.radioInput {
+  accent-color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+ 
+.radioLabel {
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+ 
+/* ─── Card Fields ─── */
+.cardFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+ 
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+ 
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+ 
+.fieldLabel {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+ 
+.fieldInput {
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+  width: 100%;
+}
+ 
+.fieldInput::placeholder {
+  color: var(--color-text-muted);
+}
+ 
+.fieldInput:focus {
+  border-color: var(--color-primary);
+}
+ 
+.inputError {
+  border-color: var(--color-primary) !important;
+}
+ 
+.errorMsg {
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+}
+ 
+/* ─── Summary Card ─── */
+.summaryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+ 
+.summaryLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+ 
+.summaryKey {
+  color: var(--color-text-muted);
+}
+ 
+.summaryVal {
+  color: var(--color-text);
+  font-weight: 500;
+}
+ 
+.summaryMovie {
+  font-family: var(--font-main);
+  font-size: var(--text-xl);
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+ 
+/* ─── Seats Row ─── */
+.seatsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+ 
+.seatDot {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  flex-shrink: 0;
+}
+ 
+.seatTag {
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: 4px 10px;
+}
+ 
+/* ─── Divider ─── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+ 
+/* ─── Price Breakdown ─── */
+.priceBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+ 
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+ 
+/* ─── Total ─── */
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+ 
+.totalLabel {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+}
+ 
+.totalPrice {
+  font-family: var(--font-main);
+  font-size: var(--text-2xl);
+  color: var(--color-text);
+  letter-spacing: 0.05em;
+}
+ 
+/* ─── Pay Button ─── */
+.payBtn {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-family: var(--font-main);
+  font-size: var(--text-xl);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+  margin-top: var(--space-sm);
+}
+ 
+.payBtn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-red);
+}
+ 
+.payBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+ 
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .paymentGrid {
+    grid-template-columns: 1fr;
+  }
+ 
+  .fieldRow {
+    grid-template-columns: 1fr;
+  }
+}
+ 

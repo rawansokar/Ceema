@@ -1,0 +1,76 @@
+{
+  "cinema": "Scene Cinema",
+  "showtime": "8:00 pm",
+  "movie": "Bershama",
+  "legend": [
+    { "type": "available", "label": "Available", "color": "#ffffff" },
+    { "type": "occupied", "label": "Occupied", "color": "#555555" },
+    { "type": "selected", "label": "Selected", "color": "#cc0000" },
+    { "type": "vip", "label": "VIP", "color": "#1a6bbf" }
+  ],
+  "rows": [
+    {
+      "rowId": "A",
+      "seats": [
+        { "id": "A1", "type": "standard", "status": "occupied" },
+        { "id": "A2", "type": "standard", "status": "occupied" },
+        { "id": "A3", "type": "standard", "status": "occupied" },
+        { "id": "A4", "type": "standard", "status": "available" },
+        { "id": "A5", "type": "standard", "status": "available" },
+        { "id": "A6", "type": "standard", "status": "available" },
+        { "id": "A7", "type": "standard", "status": "available" },
+        { "id": "A8", "type": "standard", "status": "available" },
+        { "id": "A9", "type": "standard", "status": "occupied" },
+        { "id": "A10", "type": "standard", "status": "available" }
+      ]
+    },
+    {
+      "rowId": "B",
+      "seats": [
+        { "id": "B1", "type": "standard", "status": "occupied" },
+        { "id": "B2", "type": "standard", "status": "occupied" },
+        { "id": "B3", "type": "standard", "status": "available" },
+        { "id": "B4", "type": "standard", "status": "available" },
+        { "id": "B5", "type": "standard", "status": "occupied" },
+        { "id": "B6", "type": "standard", "status": "available" },
+        { "id": "B7", "type": "standard", "status": "available" },
+        { "id": "B8", "type": "standard", "status": "available" },
+        { "id": "B9", "type": "standard", "status": "occupied" },
+        { "id": "B10", "type": "standard", "status": "available" }
+      ]
+    },
+    {
+      "rowId": "C",
+      "seats": [
+        { "id": "C1", "type": "standard", "status": "available" },
+        { "id": "C2", "type": "standard", "status": "available" },
+        { "id": "C3", "type": "standard", "status": "occupied" },
+        { "id": "C4", "type": "standard", "status": "available" },
+        { "id": "C5", "type": "standard", "status": "available" },
+        { "id": "C6", "type": "standard", "status": "available" },
+        { "id": "C7", "type": "standard", "status": "occupied" },
+        { "id": "C8", "type": "standard", "status": "available" },
+        { "id": "C9", "type": "standard", "status": "available" },
+        { "id": "C10", "type": "standard", "status": "available" }
+      ]
+    },
+    {
+      "rowId": "D",
+      "seats": [
+        { "id": "D1", "type": "vip", "status": "available" },
+        { "id": "D2", "type": "vip", "status": "occupied" },
+        { "id": "D3", "type": "vip", "status": "available" },
+        { "id": "D4", "type": "vip", "status": "available" },
+        { "id": "D5", "type": "vip", "status": "occupied" },
+        { "id": "D6", "type": "vip", "status": "available" },
+        { "id": "D7", "type": "vip", "status": "available" },
+        { "id": "D8", "type": "vip", "status": "available" }
+      ]
+    }
+  ],
+  "pricing": {
+    "standard": 200,
+    "vip": 350,
+    "serviceFee": 30
+  }
+}
