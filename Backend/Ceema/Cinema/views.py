@@ -5,7 +5,8 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.db import transaction
-from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiResponse, inline_serializer
 from rest_framework import generics, serializers as drf_serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -119,6 +120,14 @@ class LogoutView(APIView):
 
 # ---------- Users ----------
 
+@extend_schema_view(
+    list=extend_schema(summary="List all users (admin only)"),
+    retrieve=extend_schema(summary="Get a user by ID"),
+    create=extend_schema(summary="Create a user (use /api/auth/register/ instead for self-signup)"),
+    update=extend_schema(summary="Replace user info (owner or admin)"),
+    partial_update=extend_schema(summary="Update some user fields (owner or admin)"),
+    destroy=extend_schema(summary="Delete a user (admin only)"),
+)
 @extend_schema(tags=["users"])
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -138,6 +147,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return UserUpdateSerializer
         return UserSerializer
 
+    @extend_schema(summary="Get or update this user's profile (bio, avatar, etc.)")
     @action(detail=True, methods=["get", "put", "patch"], url_path="profile")
     def profile(self, request, pk=None):
         user = self.get_object()
@@ -149,6 +159,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data)
 
+    @extend_schema(request=None, summary="Follow this user")
     @action(detail=True, methods=["post"], url_path="follow")
     def follow(self, request, pk=None):
         target = self.get_object()
@@ -170,6 +181,7 @@ class UserViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
         )
 
+    @extend_schema(request=None, summary="Unfollow this user")
     @action(detail=True, methods=["post"], url_path="unfollow")
     def unfollow(self, request, pk=None):
         target = self.get_object()
@@ -181,11 +193,13 @@ class UserViewSet(viewsets.ModelViewSet):
         profile.save(update_fields=["followers_count"])
         return Response({"following": False, "removed": bool(deleted)})
 
+    @extend_schema(summary="List users who follow this user")
     @action(detail=True, methods=["get"], url_path="followers")
     def followers(self, request, pk=None):
         user = self.get_object()
         return Response(FollowSerializer(user.follower_links.all(), many=True).data)
 
+    @extend_schema(summary="List users that this user follows")
     @action(detail=True, methods=["get"], url_path="following")
     def following(self, request, pk=None):
         user = self.get_object()
@@ -194,6 +208,29 @@ class UserViewSet(viewsets.ModelViewSet):
 
 # ---------- Movies ----------
 
+MOVIE_FILTER_PARAMS = [
+    OpenApiParameter("q", OpenApiTypes.STR, description="Search by title or description (case-insensitive)"),
+    OpenApiParameter("genre", OpenApiTypes.STR, description="Filter by genre (e.g. Sci-Fi, Action)"),
+    OpenApiParameter("language", OpenApiTypes.STR, description="Filter by language (e.g. English, Arabic)"),
+    OpenApiParameter("year", OpenApiTypes.INT, description="Filter by release year"),
+    OpenApiParameter("country", OpenApiTypes.STR, description="Filter by country"),
+    OpenApiParameter("city", OpenApiTypes.STR, description="Filter by showtime city"),
+    OpenApiParameter("date", OpenApiTypes.DATE, description="Filter by showtime date (YYYY-MM-DD)"),
+    OpenApiParameter("min_rating", OpenApiTypes.NUMBER, description="Minimum rating (0–10)"),
+    OpenApiParameter("now_playing", OpenApiTypes.BOOL, description="Only currently-playing movies"),
+    OpenApiParameter("in_cinemas", OpenApiTypes.BOOL, description="Only movies in cinemas"),
+    OpenApiParameter("featured", OpenApiTypes.BOOL, description="Only featured movies"),
+]
+
+
+@extend_schema_view(
+    list=extend_schema(parameters=MOVIE_FILTER_PARAMS, summary="List movies (with optional filters)"),
+    retrieve=extend_schema(summary="Get a single movie by ID"),
+    create=extend_schema(summary="Create a new movie (admin only)"),
+    update=extend_schema(summary="Replace a movie (admin only)"),
+    partial_update=extend_schema(summary="Update some fields of a movie (admin only)"),
+    destroy=extend_schema(summary="Delete a movie (admin only)"),
+)
 @extend_schema(tags=["movies"])
 class MovieViewSet(viewsets.ModelViewSet):
     serializer_class = MovieSerializer
@@ -254,10 +291,21 @@ class MovieViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAdmin()]
 
+    @extend_schema(parameters=MOVIE_FILTER_PARAMS, summary="Search & filter movies")
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def search(self, request):
         return Response(MovieSerializer(self.get_queryset(), many=True).data)
 
+    @extend_schema(
+        summary="Get available filter values (genres, languages, years, cities)",
+        description="Returns lists of all unique genres, languages, release years, and showtime cities so the front-end can populate dropdowns.",
+        responses={200: inline_serializer("FilterOptions", fields={
+            "genres": drf_serializers.ListField(child=drf_serializers.CharField()),
+            "languages": drf_serializers.ListField(child=drf_serializers.CharField()),
+            "years": drf_serializers.ListField(child=drf_serializers.IntegerField()),
+            "cities": drf_serializers.ListField(child=drf_serializers.CharField()),
+        })},
+    )
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def filters(self, request):
         movies = Movie.objects.all()
@@ -271,21 +319,25 @@ class MovieViewSet(viewsets.ModelViewSet):
             }
         )
 
+    @extend_schema(summary="List featured/highlighted movies")
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def featured(self, request):
         movies = self.get_queryset().filter(is_featured=True)
         return Response(MovieSerializer(movies, many=True).data)
 
+    @extend_schema(summary="List movies currently playing")
     @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path="now-playing")
     def now_playing(self, request):
         movies = self.get_queryset().filter(is_now_playing=True)
         return Response(MovieSerializer(movies, many=True).data)
 
+    @extend_schema(summary="List movies still showing in cinemas")
     @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path="in-cinemas")
     def in_cinemas(self, request):
         movies = self.get_queryset().filter(is_in_cinemas=True)
         return Response(MovieSerializer(movies, many=True).data)
 
+    @extend_schema(summary="Top-grossing Egyptian/Arabic movies (ranked by box office in EGP)")
     @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path="highest-grossing-egyptian")
     def highest_grossing_egyptian(self, request):
         movies = (
@@ -296,6 +348,17 @@ class MovieViewSet(viewsets.ModelViewSet):
         )
         return Response(MovieSerializer(movies, many=True).data)
 
+    @extend_schema(
+        methods=["GET"],
+        responses={200: ReviewSerializer(many=True)},
+        summary="List reviews for this movie",
+    )
+    @extend_schema(
+        methods=["POST"],
+        request=ReviewSerializer,
+        responses={201: ReviewSerializer},
+        summary="Add a review for this movie",
+    )
     @action(detail=True, methods=["get", "post"], url_path="reviews")
     def reviews(self, request, pk=None):
         movie = self.get_object()
@@ -307,11 +370,13 @@ class MovieViewSet(viewsets.ModelViewSet):
         serializer.save(user=request.user, movie=movie)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @extend_schema(summary="List all showtimes for this movie")
     @action(detail=True, methods=["get"], url_path="showtimes")
     def showtimes(self, request, pk=None):
         movie = self.get_object()
         return Response(ShowtimeSerializer(movie.showtimes.all(), many=True).data)
 
+    @extend_schema(summary="List cast & crew credits for this movie")
     @action(detail=True, methods=["get"], permission_classes=[AllowAny])
     def credits(self, request, pk=None):
         movie = self.get_object()
@@ -319,6 +384,20 @@ class MovieViewSet(viewsets.ModelViewSet):
         return Response(MovieCreditSerializer(credits, many=True).data)
 
 
+PERSON_FILTER_PARAMS = [
+    OpenApiParameter("q", OpenApiTypes.STR, description="Search by full name"),
+    OpenApiParameter("role", OpenApiTypes.STR, description="Filter by primary role: actor, director, screenwriter, dop, producer"),
+]
+
+
+@extend_schema_view(
+    list=extend_schema(parameters=PERSON_FILTER_PARAMS, summary="List people (with optional filters)"),
+    retrieve=extend_schema(summary="Get a person by ID"),
+    create=extend_schema(summary="Create a new person (admin only)"),
+    update=extend_schema(summary="Replace a person (admin only)"),
+    partial_update=extend_schema(summary="Update some fields of a person (admin only)"),
+    destroy=extend_schema(summary="Delete a person (admin only)"),
+)
 @extend_schema(tags=["people"])
 class PersonViewSet(viewsets.ModelViewSet):
     serializer_class = PersonSerializer
@@ -340,11 +419,13 @@ class PersonViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAdmin()]
 
+    @extend_schema(summary="List only actors")
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def actors(self, request):
         people = self.get_queryset().filter(primary_role=Person.ROLE_ACTOR)
         return Response(PersonSerializer(people, many=True).data)
 
+    @extend_schema(summary="List only filmmakers (directors, writers, DOPs, producers)")
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def filmmakers(self, request):
         people = self.get_queryset().exclude(primary_role=Person.ROLE_ACTOR)
@@ -353,6 +434,21 @@ class PersonViewSet(viewsets.ModelViewSet):
 
 # ---------- News ----------
 
+NEWS_FILTER_PARAMS = [
+    OpenApiParameter("q", OpenApiTypes.STR, description="Search by title or summary"),
+    OpenApiParameter("category", OpenApiTypes.STR, description="Filter by category: movies, box_office, awards, streaming, tv"),
+    OpenApiParameter("featured", OpenApiTypes.BOOL, description="Only featured articles"),
+]
+
+
+@extend_schema_view(
+    list=extend_schema(parameters=NEWS_FILTER_PARAMS, summary="List news articles (with optional filters)"),
+    retrieve=extend_schema(summary="Get a news article by ID"),
+    create=extend_schema(summary="Publish a new news article (admin only)"),
+    update=extend_schema(summary="Replace a news article (admin only)"),
+    partial_update=extend_schema(summary="Update some fields of a news article (admin only)"),
+    destroy=extend_schema(summary="Delete a news article (admin only)"),
+)
 @extend_schema(tags=["news"])
 class NewsArticleViewSet(viewsets.ModelViewSet):
     serializer_class = NewsArticleSerializer
@@ -387,6 +483,7 @@ class NewsArticleViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 
+    @extend_schema(summary="List only featured news articles")
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def featured(self, request):
         articles = self.get_queryset().filter(is_featured=True)
@@ -395,6 +492,22 @@ class NewsArticleViewSet(viewsets.ModelViewSet):
 
 # ---------- Showtimes ----------
 
+SHOWTIME_FILTER_PARAMS = [
+    OpenApiParameter("city", OpenApiTypes.STR, description="Filter by city"),
+    OpenApiParameter("genre", OpenApiTypes.STR, description="Filter by movie genre"),
+    OpenApiParameter("date", OpenApiTypes.DATE, description="Filter by showtime date (YYYY-MM-DD)"),
+    OpenApiParameter("movie", OpenApiTypes.INT, description="Filter by movie ID"),
+]
+
+
+@extend_schema_view(
+    list=extend_schema(parameters=SHOWTIME_FILTER_PARAMS, summary="List showtimes (with optional filters)"),
+    retrieve=extend_schema(summary="Get a showtime by ID"),
+    create=extend_schema(summary="Schedule a new showtime (admin only)"),
+    update=extend_schema(summary="Replace a showtime (admin only)"),
+    partial_update=extend_schema(summary="Update some fields of a showtime (admin only)"),
+    destroy=extend_schema(summary="Delete a showtime (admin only)"),
+)
 @extend_schema(tags=["showtimes"])
 class ShowtimeViewSet(viewsets.ModelViewSet):
     serializer_class = ShowtimeSerializer
@@ -422,6 +535,7 @@ class ShowtimeViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAdmin()]
 
+    @extend_schema(summary="List all seats for this showtime (with availability status)")
     @action(detail=True, methods=["get"], permission_classes=[AllowAny])
     def seats(self, request, pk=None):
         showtime = self.get_object()
@@ -429,6 +543,14 @@ class ShowtimeViewSet(viewsets.ModelViewSet):
         return Response(SeatSerializer(seats, many=True).data)
 
 
+@extend_schema_view(
+    list=extend_schema(summary="List all seats"),
+    retrieve=extend_schema(summary="Get a seat by ID"),
+    create=extend_schema(summary="Create a new seat (admin only)"),
+    update=extend_schema(summary="Replace a seat (admin only)"),
+    partial_update=extend_schema(summary="Update some fields of a seat (admin only)"),
+    destroy=extend_schema(summary="Delete a seat (admin only)"),
+)
 @extend_schema(tags=["seats"])
 class SeatViewSet(viewsets.ModelViewSet):
     queryset = Seat.objects.select_related("showtime", "showtime__movie").all()
@@ -441,6 +563,7 @@ class SeatViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
         return [IsAdmin()]
 
+    @extend_schema(request=None, responses={200: SeatSerializer}, summary="Reserve this seat")
     @action(detail=True, methods=["post"], url_path="reserve")
     def reserve(self, request, pk=None):
         seat = self.get_object()
@@ -450,6 +573,7 @@ class SeatViewSet(viewsets.ModelViewSet):
             return Response({"detail": exc.message}, status=400)
         return Response(SeatSerializer(seat).data)
 
+    @extend_schema(request=None, responses={200: SeatSerializer}, summary="Release a reserved seat")
     @action(detail=True, methods=["post"], url_path="release")
     def release(self, request, pk=None):
         seat = self.get_object()
@@ -459,6 +583,14 @@ class SeatViewSet(viewsets.ModelViewSet):
 
 # ---------- Bookings ----------
 
+@extend_schema_view(
+    list=extend_schema(summary="List your bookings (admins see all)"),
+    retrieve=extend_schema(summary="Get one of your bookings"),
+    create=extend_schema(summary="Book a showtime — pick seats and pay"),
+    update=extend_schema(summary="Replace a booking"),
+    partial_update=extend_schema(summary="Update some fields of a booking"),
+    destroy=extend_schema(summary="Delete a booking"),
+)
 @extend_schema(tags=["bookings"])
 class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
@@ -533,6 +665,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             )
         return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
 
+    @extend_schema(request=None, responses={200: BookingSerializer}, summary="Cancel this booking")
     @action(detail=True, methods=["post"], url_path="cancel")
     def cancel(self, request, pk=None):
         booking = self.get_object()
@@ -553,6 +686,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             booking.payment.save(update_fields=["status"])
         return Response(BookingSerializer(booking).data)
 
+    @extend_schema(summary="List all tickets in this booking")
     @action(detail=True, methods=["get"], url_path="tickets")
     def tickets(self, request, pk=None):
         booking = self.get_object()
@@ -560,6 +694,10 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(TicketSerializer(booking.tickets.all(), many=True).data)
 
 
+@extend_schema_view(
+    list=extend_schema(summary="List all your tickets"),
+    retrieve=extend_schema(summary="Get a ticket by ID"),
+)
 @extend_schema(tags=["tickets"])
 class TicketViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TicketSerializer
@@ -576,6 +714,14 @@ class TicketViewSet(viewsets.ReadOnlyModelViewSet):
 
 # ---------- Posts ----------
 
+@extend_schema_view(
+    list=extend_schema(summary="List all social posts (newest first)"),
+    retrieve=extend_schema(summary="Get a post by ID"),
+    create=extend_schema(summary="Create a new social post"),
+    update=extend_schema(summary="Replace your post"),
+    partial_update=extend_schema(summary="Update some fields of your post"),
+    destroy=extend_schema(summary="Delete your post"),
+)
 @extend_schema(tags=["posts"])
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by("-created_at")
@@ -590,6 +736,7 @@ class PostViewSet(viewsets.ModelViewSet):
             return [IsOwnerOrAdmin()]
         return [IsAuthenticated()]
 
+    @extend_schema(request=None, summary="Toggle like on this post")
     @action(detail=True, methods=["post"], url_path="like")
     def like(self, request, pk=None):
         post = self.get_object()
@@ -599,6 +746,7 @@ class PostViewSet(viewsets.ModelViewSet):
             return Response({"liked": False, "likes_count": post.likes.count()})
         return Response({"liked": True, "likes_count": post.likes.count()}, status=status.HTTP_201_CREATED)
 
+    @extend_schema(request=None, summary="Share this post")
     @action(detail=True, methods=["post"], url_path="share")
     def share(self, request, pk=None):
         original = self.get_object()
@@ -610,6 +758,17 @@ class PostViewSet(viewsets.ModelViewSet):
         )
         return Response(PostSerializer(post).data, status=status.HTTP_201_CREATED)
 
+    @extend_schema(
+        methods=["GET"],
+        responses={200: CommentSerializer(many=True)},
+        summary="List comments on this post",
+    )
+    @extend_schema(
+        methods=["POST"],
+        request=CommentSerializer,
+        responses={201: CommentSerializer},
+        summary="Add a comment to this post",
+    )
     @action(detail=True, methods=["get", "post"], url_path="comments")
     def comments(self, request, pk=None):
         post = self.get_object()
@@ -623,12 +782,21 @@ class PostViewSet(viewsets.ModelViewSet):
 
 # ---------- Courses ----------
 
+@extend_schema_view(
+    list=extend_schema(summary="List all film courses"),
+    retrieve=extend_schema(summary="Get a course by ID"),
+    create=extend_schema(summary="Create a new course (admin only)"),
+    update=extend_schema(summary="Replace a course (admin only)"),
+    partial_update=extend_schema(summary="Update some fields of a course (admin only)"),
+    destroy=extend_schema(summary="Delete a course (admin only)"),
+)
 @extend_schema(tags=["courses"])
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [IsAdminOrReadOnly]
 
+    @extend_schema(request=None, summary="Enroll the current user in this course")
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def enroll(self, request, pk=None):
         course = self.get_object()
@@ -637,6 +805,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         course.users.add(request.user)
         return Response({"detail": f"Enrolled in '{course.title}'."})
 
+    @extend_schema(request=None, summary="Unenroll the current user from this course")
     @action(detail=True, methods=["post"], url_path="unenroll", permission_classes=[IsAuthenticated])
     def unenroll(self, request, pk=None):
         course = self.get_object()
@@ -644,6 +813,14 @@ class CourseViewSet(viewsets.ModelViewSet):
         return Response({"detail": f"Unenrolled from '{course.title}'."})
 
 
+@extend_schema_view(
+    list=extend_schema(summary="List all reviews"),
+    retrieve=extend_schema(summary="Get a review by ID"),
+    create=extend_schema(summary="Write a new review"),
+    update=extend_schema(summary="Replace your review"),
+    partial_update=extend_schema(summary="Update some fields of your review"),
+    destroy=extend_schema(summary="Delete your review"),
+)
 @extend_schema(tags=["reviews"])
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
@@ -672,6 +849,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 # ---------- Badges & Rewards ----------
 
+@extend_schema_view(
+    list=extend_schema(summary="List all available badges"),
+    retrieve=extend_schema(summary="Get a badge by ID"),
+)
 @extend_schema(tags=["badges & rewards"])
 class BadgeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Badge.objects.all()
@@ -679,12 +860,17 @@ class BadgeViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+@extend_schema_view(
+    list=extend_schema(summary="List all available rewards"),
+    retrieve=extend_schema(summary="Get a reward by ID"),
+)
 @extend_schema(tags=["badges & rewards"])
 class RewardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Reward.objects.all()
     serializer_class = RewardSerializer
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(request=None, summary="Redeem this reward using your points")
     @action(detail=True, methods=["post"], url_path="redeem")
     def redeem(self, request, pk=None):
         reward = self.get_object()
@@ -704,6 +890,10 @@ class RewardViewSet(viewsets.ReadOnlyModelViewSet):
 
 # ---------- Recommendations ----------
 
+@extend_schema_view(
+    list=extend_schema(summary="List your personalised movie recommendations"),
+    retrieve=extend_schema(summary="Get a single recommendation by ID"),
+)
 @extend_schema(tags=["recommendations"])
 class RecommendationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RecommendationSerializer
@@ -717,6 +907,14 @@ class RecommendationViewSet(viewsets.ReadOnlyModelViewSet):
 
 # ---------- Admin: Reports ----------
 
+@extend_schema_view(
+    list=extend_schema(summary="List all reports (admin only)"),
+    retrieve=extend_schema(summary="Get a report by ID (admin only)"),
+    create=extend_schema(summary="Submit a new report (admin only)"),
+    update=extend_schema(summary="Replace a report (admin only)"),
+    partial_update=extend_schema(summary="Update some fields of a report (admin only)"),
+    destroy=extend_schema(summary="Delete a report (admin only)"),
+)
 @extend_schema(tags=["admin"])
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
@@ -728,6 +926,17 @@ class ReportViewSet(viewsets.ModelViewSet):
         admin = get_object_or_404(AdminModel, id=self.request.user.id)
         serializer.save(admin=admin)
 
+    @extend_schema(
+        request=inline_serializer(
+            "ReportReviewRequest",
+            fields={
+                "status": drf_serializers.CharField(required=False, help_text="e.g. reviewed, dismissed"),
+                "reason": drf_serializers.CharField(required=False),
+            },
+        ),
+        responses={200: ReportSerializer},
+        summary="Mark a report as reviewed (admin)",
+    )
     @action(detail=True, methods=["post"], url_path="review")
     def review(self, request, pk=None):
         report = self.get_object()
@@ -740,12 +949,21 @@ class ReportViewSet(viewsets.ModelViewSet):
 
 # ---------- Admin: User management ----------
 
+@extend_schema_view(
+    list=extend_schema(summary="List all users with admin filters (admin only)"),
+    retrieve=extend_schema(summary="Get any user by ID (admin only)"),
+    create=extend_schema(summary="Create a new user as admin"),
+    update=extend_schema(summary="Replace user info (admin only)"),
+    partial_update=extend_schema(summary="Update some user fields (admin only)"),
+    destroy=extend_schema(summary="Delete a user (admin only)"),
+)
 @extend_schema(tags=["admin"])
 class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdmin]
 
+    @extend_schema(request=None, responses={200: UserSerializer}, summary="Ban this user (admin only)")
     @action(detail=True, methods=["post"], url_path="ban")
     def ban(self, request, pk=None):
         user = self.get_object()
@@ -753,6 +971,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user.save(update_fields=["is_banned"])
         return Response(UserSerializer(user).data)
 
+    @extend_schema(request=None, responses={200: UserSerializer}, summary="Unban this user (admin only)")
     @action(detail=True, methods=["post"], url_path="unban")
     def unban(self, request, pk=None):
         user = self.get_object()
@@ -760,6 +979,20 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user.save(update_fields=["is_banned"])
         return Response(UserSerializer(user).data)
 
+    @extend_schema(
+        summary="Platform statistics dashboard (admin only)",
+        description="Returns counts of users, movies, showtimes, bookings, tickets, posts, open reports, and paid payments.",
+        responses={200: inline_serializer("AdminStatistics", fields={
+            "users": drf_serializers.IntegerField(),
+            "movies": drf_serializers.IntegerField(),
+            "showtimes": drf_serializers.IntegerField(),
+            "bookings": drf_serializers.IntegerField(),
+            "tickets": drf_serializers.IntegerField(),
+            "posts": drf_serializers.IntegerField(),
+            "reports_open": drf_serializers.IntegerField(),
+            "payments_paid": drf_serializers.IntegerField(),
+        })},
+    )
     @action(detail=False, methods=["get"], url_path="statistics")
     def statistics(self, request):
         return Response({
@@ -776,6 +1009,10 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         })
 
 
+@extend_schema_view(
+    list=extend_schema(summary="List your purchase history"),
+    retrieve=extend_schema(summary="Get a single purchase by ID"),
+)
 @extend_schema(tags=["purchases"])
 class PurchaseViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PurchaseSerializer
@@ -789,6 +1026,14 @@ class PurchaseViewSet(viewsets.ReadOnlyModelViewSet):
         return Purchase.objects.filter(user=self.request.user)
 
 
+@extend_schema_view(
+    list=extend_schema(summary="List payments"),
+    retrieve=extend_schema(summary="Get a payment by ID"),
+    create=extend_schema(summary="Record a new payment"),
+    update=extend_schema(summary="Replace a payment record"),
+    partial_update=extend_schema(summary="Update some fields of a payment"),
+    destroy=extend_schema(summary="Delete a payment"),
+)
 @extend_schema(tags=["payments"])
 class PaymentViewSet(viewsets.ModelViewSet):
     serializer_class = PaymentSerializer
@@ -803,6 +1048,11 @@ class PaymentViewSet(viewsets.ModelViewSet):
         return qs.filter(booking__user=self.request.user)
 
     @extend_schema(request=PaymentProcessSerializer, responses={201: PaymentSerializer})
+    @extend_schema(
+        request=PaymentProcessSerializer,
+        responses={200: PurchaseSerializer},
+        summary="Mock payment processing for a booking",
+    )
     @action(detail=False, methods=["post"], url_path="mock-process")
     def mock_process(self, request):
         serializer = PaymentProcessSerializer(data=request.data)
@@ -909,6 +1159,14 @@ def chatbot_recommendation_message(movies):
     return f"I found these from the CEEMA catalog: {titles}."
 
 
+@extend_schema_view(
+    list=extend_schema(summary="List your chatbot sessions"),
+    retrieve=extend_schema(summary="Get a chatbot session by ID"),
+    create=extend_schema(summary="Start a new chatbot session"),
+    update=extend_schema(summary="Replace a chatbot session"),
+    partial_update=extend_schema(summary="Update some fields of a chatbot session"),
+    destroy=extend_schema(summary="End/delete a chatbot session"),
+)
 @extend_schema(tags=["chatbot"])
 class ChatbotViewSet(viewsets.ModelViewSet):
     serializer_class = ChatbotSerializer
@@ -924,6 +1182,7 @@ class ChatbotViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @extend_schema(request=None, responses={200: ChatbotSerializer}, summary="Bot asks user a mood question")
     @action(detail=True, methods=["post"], url_path="ask-mood-question")
     def ask_mood_question(self, request, pk=None):
         chatbot = self.get_object()
@@ -935,7 +1194,12 @@ class ChatbotViewSet(viewsets.ModelViewSet):
         )
         return Response(ChatbotSerializer(chatbot).data)
 
-    @extend_schema(request=ChatbotAnswerSerializer, responses={200: ChatbotSerializer})
+    @extend_schema(
+        request=ChatbotAnswerSerializer,
+        responses={200: ChatbotSerializer},
+        summary="Send the user's answer to the chatbot",
+        description="Detects mood from the answer and returns updated chatbot state with movie recommendations.",
+    )
     @action(detail=True, methods=["post"], url_path="receive-answer")
     def receive_answer(self, request, pk=None):
         chatbot = self.get_object()
@@ -956,6 +1220,11 @@ class ChatbotViewSet(viewsets.ModelViewSet):
         )
         return Response(ChatbotSerializer(chatbot).data)
 
+    @extend_schema(
+        parameters=[OpenApiParameter("q", OpenApiTypes.STR, description="User's mood or query text")],
+        responses={200: MovieSerializer(many=True)},
+        summary="Get movie recommendations based on mood",
+    )
     @action(detail=True, methods=["get"], url_path="recommend-movies")
     def recommend_movies(self, request, pk=None):
         chatbot = self.get_object()

@@ -1,8 +1,14 @@
 from django.urls import include, path
+from drf_spectacular.utils import extend_schema
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
+
+
+@extend_schema(tags=["auth"], summary="Get a fresh access token from a refresh token")
+class CeemaTokenRefreshView(TokenRefreshView):
+    pass
 
 router = DefaultRouter()
 router.register(r"users", views.UserViewSet, basename="user")
@@ -30,7 +36,7 @@ urlpatterns = [
     path("auth/register/", views.RegisterView.as_view(), name="auth-register"),
     path("auth/login/", views.LoginView.as_view(), name="auth-login"),
     path("auth/logout/", views.LogoutView.as_view(), name="auth-logout"),
-    path("auth/refresh/", TokenRefreshView.as_view(), name="auth-refresh"),
+    path("auth/refresh/", CeemaTokenRefreshView.as_view(), name="auth-refresh"),
 
     # All resource routes
     path("", include(router.urls)),

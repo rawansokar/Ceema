@@ -145,8 +145,35 @@ SIMPLE_JWT = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "CEEMA API",
-    "DESCRIPTION": "Cinema platform API — movies, bookings, tickets, social features.",
+    "DESCRIPTION": (
+        "Cinema platform API — movies, bookings, tickets, and social features.\n\n"
+        "**Authentication:** Most endpoints require a JWT access token. "
+        "Get one by calling `POST /api/auth/login/`, then click the green **Authorize** "
+        "button at the top right and paste the `access` token.\n\n"
+        "**Sample users (password = `ceema123`):** `alice@ceema.com` (admin), "
+        "`sara@ceema.com`, `omar@ceema.com`, `rawan@ceema.com`."
+    ),
     "VERSION": "1.0.0",
+    "TAGS": [
+        {"name": "auth", "description": "Register, login, logout, refresh JWT tokens."},
+        {"name": "users", "description": "User accounts, profiles, follow/unfollow."},
+        {"name": "movies", "description": "Browse, filter, and review movies."},
+        {"name": "people", "description": "Actors, directors, and other film crew."},
+        {"name": "news", "description": "Cinema news articles & announcements."},
+        {"name": "showtimes", "description": "Movie screenings at specific times/cities."},
+        {"name": "seats", "description": "Reserve and release individual seats."},
+        {"name": "bookings", "description": "Create, cancel, and view your bookings."},
+        {"name": "tickets", "description": "Tickets generated from confirmed bookings."},
+        {"name": "posts", "description": "Social posts, likes, comments, shares."},
+        {"name": "courses", "description": "Educational film courses users can enroll in."},
+        {"name": "reviews", "description": "User reviews on movies."},
+        {"name": "badges & rewards", "description": "Earn badges and redeem points for rewards."},
+        {"name": "recommendations", "description": "Personalised movie recommendations."},
+        {"name": "purchases", "description": "Purchase history (read-only)."},
+        {"name": "payments", "description": "Mock payment processing for bookings."},
+        {"name": "chatbot", "description": "Mood-based movie recommendation chatbot."},
+        {"name": "admin", "description": "Admin-only endpoints: reports, user management, statistics."},
+    ],
     "SECURITY": [{"BearerAuth": []}],
     "APPEND_COMPONENTS": {
         "securitySchemes": {
