@@ -1,7 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { getFeedPosts,likePost,createPost,deletePost,addComment,sharePost } from '../../services/feedService'
+import {
+  getFeedPosts,
+  likePost,
+  createPost,
+  deletePost,
+  addComment,
+  deleteComment,
+  getPostComments,
+  sharePost
+} from '../../services/feedService'
+import { followUser, unfollowUser } from '../../services/authService'
 import Layout from '../../components/Layout/Layout'
 import styles from './Feed.module.css'
 import {
@@ -11,6 +21,7 @@ import {
   FaTrash,
   FaUserPlus,
   FaImage,
+  FaVideo,
   FaCompass
 } from 'react-icons/fa'
 
@@ -57,7 +68,7 @@ const Feed = () => {
   const [showComments, setShowComments] = useState({})
   const [postComments, setPostComments] = useState({})
 
-  const [imagePreview, setImagePreview] = useState(null)
+  const [mediaPreview, setMediaPreview] = useState(null)
   const [followedUsers, setFollowedUsers] = useState([])
 
   // ─── Load posts ───
@@ -74,20 +85,37 @@ const Feed = () => {
           id: p.user?.id || p.user,
           name: p.user?.name || p.user_name,
           username: `@user${p.user?.id || p.user}`,
-          avatar: `https://i.pravatar.cc/40?img=${p.user?.id || p.user || 10}`
+          avatar: p.user?.avatar || `https://i.pravatar.cc/40?img=${p.user?.id || p.user || 10}`
         },
 
         content: p.content,
-        image: p.image || null,
+        media: p.media_url ? { url: p.media_url, type: p.media_type } : null,
         likes: p.likes_count || 0,
         comments: p.comments_count || 0,
         time: new Date(p.created_at).toLocaleString(),
 
         original_post: p.original_post || null,
-        original_post_content: p.original_post_content || null
+        original_post_content: p.original_post_content || null,
+        original_post_media: p.original_post_media_url
+          ? { url: p.original_post_media_url, type: p.original_post_media_type }
+          : null,
+        shared: Boolean(p.original_post),
+        shared_post: p.original_post
+          ? {
+              id: p.original_post,
+              user: { name: 'Original post', username: '' },
+              content: p.original_post_content || '',
+              media: p.original_post_media_url
+                ? { url: p.original_post_media_url, type: p.original_post_media_type }
+                : null,
+              time: '',
+            }
+          : null,
+        liked: Boolean(p.is_liked),
       }))
 
       setPosts(formatted)
+      setLikedPosts(formatted.filter((post) => post.liked).map((post) => post.id))
       setLoading(false)
     }
 
@@ -107,11 +135,6 @@ const Feed = () => {
       return
     }
 
-    if (likedPosts.includes(postId)) {
-      toast.info('Already liked!')
-      return
-    }
-
     const result = await likePost(postId)
 
     if (!result.success) {
@@ -127,7 +150,11 @@ const Feed = () => {
       )
     )
 
-    setLikedPosts((prev) => [...prev, postId])
+    setLikedPosts((prev) =>
+      result.liked
+        ? [...new Set([...prev, postId])]
+        : prev.filter((id) => id !== postId)
+    )
   }
 
   // ─── Share ───
@@ -158,7 +185,7 @@ const Feed = () => {
       },
 
       content: '',
-      image: null,
+      media: null,
       likes: 0,
       comments: 0,
       time: new Date(p.created_at).toLocaleString(),
@@ -169,7 +196,7 @@ const Feed = () => {
         id: post.id,
         user: post.user,
         content: post.content,
-        image: post.image,
+        media: post.media,
         time: post.time
       }
     }
@@ -196,11 +223,24 @@ const Feed = () => {
   }
 
   // ─── Toggle comments ───
-  const toggleComments = (postId) => {
+  const toggleComments = async (postId) => {
+    const willOpen = !showComments[postId]
     setShowComments((prev) => ({
       ...prev,
-      [postId]: !prev[postId]
+      [postId]: willOpen
     }))
+    if (willOpen && !postComments[postId]) {
+      const comments = await getPostComments(postId)
+      setPostComments((prev) => ({
+        ...prev,
+        [postId]: comments.map((comment) => ({
+          id: comment.id,
+          userId: comment.user,
+          user: comment.user_name,
+          text: comment.content,
+        })),
+      }))
+    }
   }
 
   // ─── Add comment ───
@@ -225,9 +265,10 @@ const Feed = () => {
     }
 
     const newComment = {
-      id: Date.now(),
-      user: user?.name || user?.username,
-      text
+      id: result.comment.id,
+      userId: result.comment.user,
+      user: result.comment.user_name || user?.name || user?.username,
+      text: result.comment.content,
     }
 
     setPostComments((prev) => ({
@@ -254,15 +295,21 @@ const Feed = () => {
     toast.success('Comment added')
   }
 
-  // ─── Upload Image ───
-  const handleImageUpload = (e) => {
+  const handleMediaUpload = (e) => {
     const file = e.target.files[0]
 
     if (!file) return
-
-    const imageUrl = URL.createObjectURL(file)
-
-    setImagePreview(imageUrl)
+    const type = file.type.startsWith('video/') ? 'video' : file.type.startsWith('image/') ? 'image' : null
+    const maxSize = type === 'video' ? 8 * 1024 * 1024 : 4 * 1024 * 1024
+    if (!type || file.size > maxSize) {
+      toast.error(type === 'video' ? 'Videos must be 8 MB or smaller' : 'Choose an image up to 4 MB or a video up to 8 MB')
+      e.target.value = ''
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setMediaPreview({ url: reader.result, type })
+    reader.onerror = () => toast.error('Could not read that file')
+    reader.readAsDataURL(file)
   }
 
   // ─── Create post ───
@@ -272,15 +319,15 @@ const Feed = () => {
       return
     }
 
-    if (!newPost.trim()) {
-      setPostError('Post cannot be empty')
+    if (!newPost.trim() && !mediaPreview) {
+      setPostError('Add text, an image, or a video')
       return
     }
 
     setSubmitting(true)
     setPostError('')
 
-    const result = await createPost(newPost.trim())
+    const result = await createPost(newPost.trim(), null, mediaPreview)
 
     if (!result.success) {
       toast.error(result.message)
@@ -303,7 +350,7 @@ const Feed = () => {
       },
 
       content: p.content,
-      image: imagePreview,
+      media: p.media_url ? { url: p.media_url, type: p.media_type } : mediaPreview,
       likes: p.likes_count || 0,
       comments: p.comments_count || 0,
       time: 'Just now'
@@ -312,27 +359,46 @@ const Feed = () => {
     setPosts((prev) => [newPostObj, ...prev])
 
     setNewPost('')
-    setImagePreview(null)
+    setMediaPreview(null)
     setSubmitting(false)
 
     toast.success('Post created!')
   }
 
-  const handleFollow = (userId) => {
+  const handleFollow = async (userId) => {
     if (!user) {
       toast.error('Please login first')
       return
     }
 
-    setFollowedUsers((prev) => {
-      if (prev.includes(userId)) {
-        toast.info('Already following')
-        return prev
-      }
+    const isFollowing = followedUsers.includes(userId)
+    const result = isFollowing ? await unfollowUser(userId) : await followUser(userId)
+    if (!result.success) {
+      toast.error(result.message)
+      return
+    }
+    setFollowedUsers((prev) =>
+      isFollowing ? prev.filter((id) => id !== userId) : [...prev, userId]
+    )
+    toast.success(isFollowing ? 'Unfollowed user' : 'Following user')
+  }
 
-      toast.success('Following user')
-      return [...prev, userId]
-    })
+  const handleDeleteComment = async (postId, commentId) => {
+    const result = await deleteComment(commentId)
+    if (!result.success) {
+      toast.error(result.message)
+      return
+    }
+    setPostComments((prev) => ({
+      ...prev,
+      [postId]: (prev[postId] || []).filter((comment) => comment.id !== commentId),
+    }))
+    setPosts((prev) =>
+      prev.map((post) => post.id === postId
+        ? { ...post, comments: Math.max(0, post.comments - 1) }
+        : post)
+    )
+    toast.success('Comment deleted')
   }
 
   return (
@@ -353,10 +419,11 @@ const Feed = () => {
 
                 <img
                   src={
-                    user.avatar ||
+                    user.profile?.avatar_url ||
                     'https://i.pravatar.cc/40?img=10'
                   }
                   className={styles.newPostAvatar}
+                  alt=""
                 />
 
                 <div className={styles.newPostRight}>
@@ -376,11 +443,17 @@ const Feed = () => {
                     {newPost.length}/500
                   </div>
 
-                  {imagePreview && (
-                    <img
-                      src={imagePreview}
-                      className={styles.postImage}
-                    />
+                  {mediaPreview && (
+                    <div className={styles.mediaPreview}>
+                      {mediaPreview.type === 'video' ? (
+                        <video src={mediaPreview.url} className={styles.postVideo} controls />
+                      ) : (
+                        <img src={mediaPreview.url} className={styles.postImage} alt="Post preview" />
+                      )}
+                      <button type="button" className={styles.removeMediaBtn} onClick={() => setMediaPreview(null)}>
+                        Remove
+                      </button>
+                    </div>
                   )}
 
                   {postError && (
@@ -400,11 +473,13 @@ const Feed = () => {
 
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
                         hidden
-                        onChange={handleImageUpload}
+                        onChange={handleMediaUpload}
                       />
                     </label>
+
+                    <span className={styles.mediaHint}><FaVideo /> Short videos up to 8 MB</span>
 
                     <button
                       className={styles.postBtn}
@@ -441,6 +516,7 @@ const Feed = () => {
                       <img
                         src={post.user.avatar}
                         className={styles.postAvatar}
+                        alt=""
                       />
 
                       <div className={styles.postUserInfo}>
@@ -467,8 +543,9 @@ const Feed = () => {
                           <div className={styles.postHeader}>
 
                             <img
-                              src={post.shared_post.user.avatar}
+                              src={post.shared_post.user.avatar || 'https://i.pravatar.cc/40?img=10'}
                               className={styles.postAvatar}
+                              alt=""
                             />
 
                             <div className={styles.postUserInfo}>
@@ -487,11 +564,12 @@ const Feed = () => {
                             {post.shared_post.content}
                           </p>
 
-                          {post.shared_post.image && (
-                            <img
-                              src={post.shared_post.image}
-                              className={styles.postImage}
-                            />
+                          {post.shared_post.media && (
+                            post.shared_post.media.type === 'video' ? (
+                              <video src={post.shared_post.media.url} className={styles.postVideo} controls />
+                            ) : (
+                              <img src={post.shared_post.media.url} className={styles.postImage} alt="" />
+                            )
                           )}
 
                         </div>
@@ -503,11 +581,12 @@ const Feed = () => {
                           {post.content}
                         </p>
 
-                        {post.image && (
-                          <img
-                            src={post.image}
-                            className={styles.postImage}
-                          />
+                        {post.media && (
+                          post.media.type === 'video' ? (
+                            <video src={post.media.url} className={styles.postVideo} controls preload="metadata" />
+                          ) : (
+                            <img src={post.media.url} className={styles.postImage} alt="" />
+                          )
                         )}
                       </>
                     )}
@@ -516,7 +595,7 @@ const Feed = () => {
                     <div className={styles.postActions}>
 
                       <button
-                        className={styles.actionBtn}
+                        className={`${styles.actionBtn} ${likedPosts.includes(post.id) ? styles.actionLiked : ''}`}
                         onClick={() =>
                           handleLike(post.id)
                         }
@@ -571,6 +650,16 @@ const Feed = () => {
                           >
                             <strong>{c.user}</strong>
                             <p>{c.text}</p>
+                            {(user?.id === c.userId || user?.role === 'admin') && (
+                              <button
+                                type="button"
+                                className={styles.deleteCommentBtn}
+                                onClick={() => handleDeleteComment(post.id, c.id)}
+                                aria-label="Delete comment"
+                              >
+                                <FaTrash />
+                              </button>
+                            )}
                           </div>
                         ))}
 

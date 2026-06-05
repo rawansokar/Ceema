@@ -12,10 +12,16 @@ const Navbar = ({ showBack = false }) => {
 
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const syncAuth = () => {
     setIsLoggedIn(!!localStorage.getItem('ceema_access'))
+    try {
+      setCurrentUser(JSON.parse(localStorage.getItem('ceema_user')) || null)
+    } catch {
+      setCurrentUser(null)
+    }
   }
 
   useEffect(() => {
@@ -83,6 +89,9 @@ const Navbar = ({ showBack = false }) => {
           <li><Link to="/feed" className={styles.navLink}>Feed</Link></li>
           <li><Link to="/news" className={styles.navLink}>News</Link></li>
           <li><Link to="/education" className={styles.navLink}>Education</Link></li>
+          {currentUser?.role === 'admin' && (
+            <li><Link to="/admin" className={styles.navLink}>Admin</Link></li>
+          )}
         </ul>
 
         {/* RIGHT */}

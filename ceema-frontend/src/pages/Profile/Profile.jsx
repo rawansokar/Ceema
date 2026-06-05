@@ -11,7 +11,7 @@ const Profile = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
-  const [editData, setEditData] = useState({ name: '', bio: '' })
+  const [editData, setEditData] = useState({ name: '', bio: '', avatar_url: '' })
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
 
@@ -29,7 +29,8 @@ const Profile = () => {
     setUser(current)
     setEditData({
         name: current.name || '',
-        bio: current.profile?.bio || ''
+        bio: current.profile?.bio || '',
+        avatar_url: current.profile?.avatar_url || '',
     })
     }
     loadUser()
@@ -60,7 +61,7 @@ const Profile = () => {
     try {
       const [userResult, profileResult] = await Promise.all([
         updateUser(user.id, { name: editData.name }),
-        updateUserProfile(user.id, { bio: editData.bio }),
+        updateUserProfile(user.id, { bio: editData.bio, avatar_url: editData.avatar_url }),
       ])
       if (userResult.success && profileResult.success) {
         const updatedUser = {
@@ -87,7 +88,11 @@ const Profile = () => {
   }
 
   const handleCancel = () => {
-    setEditData({ name: user.name || '', bio: user.profile?.bio || '' })
+    setEditData({
+      name: user.name || '',
+      bio: user.profile?.bio || '',
+      avatar_url: user.profile?.avatar_url || '',
+    })
     setErrors({})
     setIsEditing(false)
   }
@@ -134,6 +139,24 @@ const Profile = () => {
     }
   }
 
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    if (!file.type.startsWith('image/') || file.size > 3 * 1024 * 1024) {
+      toast.error('Choose an image up to 3 MB')
+      e.target.value = ''
+      return
+    }
+    try {
+      const avatarUrl = await fileToDataUrl(file)
+      setEditData((prev) => ({ ...prev, avatar_url: avatarUrl }))
+    } catch {
+      toast.error('Profile image could not be read')
+    } finally {
+      e.target.value = ''
+    }
+  }
+
   const formatStat = (val) => {
     if (!val && val !== 0) return '0'
     if (val >= 1000) return (val / 1000).toFixed(1) + 'k'
@@ -154,7 +177,7 @@ const Profile = () => {
           <div className={styles.avatarSection}>
             <img
               src={
-                user.profile?.avatar_url ||
+                editData.avatar_url || user.profile?.avatar_url ||
                 `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=cc0000&color=fff&size=90`
               }
               alt={user.name}
@@ -176,6 +199,21 @@ const Profile = () => {
           {isEditing && (
             <div className={styles.editCard}>
               {/* Name */}
+<div className={styles.editField}>
+  <label className={styles.editLabel}>Profile Picture</label>
+  <div className={styles.avatarEditor}>
+    <img
+      src={editData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(editData.name || user.name)}&background=cc0000&color=fff&size=90`}
+      alt="Profile preview"
+      className={styles.avatarPreview}
+    />
+    <label className={styles.uploadAvatarBtn}>
+      Upload Image
+      <input type="file" accept="image/*" className={styles.fileInput} onChange={handleAvatarUpload} />
+    </label>
+  </div>
+</div>
+
 <div className={styles.editField}>
   <label className={styles.editLabel}>Name</label>
   <input
@@ -219,7 +257,7 @@ const Profile = () => {
             <div className={styles.statBlock}>
               <span className={styles.statLabel}>Likes</span>
               <span className={styles.statNumber}>
-                {formatStat(user.profile?.followers_count)}
+                {formatStat(user.likes_count)}
               </span>
             </div>
             <div className={styles.statDivider} />
@@ -231,7 +269,7 @@ const Profile = () => {
             </div>
             <div className={styles.statDivider} />
             <div className={styles.statBlock}>
-              <span className={styles.statLabel}>Friends</span>
+              <span className={styles.statLabel}>Following</span>
               <span className={styles.statNumber}>
                 {formatStat(user.following_count)}
               </span>

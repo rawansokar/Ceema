@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
+import { getCurrentUser } from '../services/authService'
 
 // Pages
 import Chatbot from '../components/Chatbot/Chatbot'
@@ -26,6 +27,11 @@ import AdminUserDetails from '../pages/AdminDashboard/users/UserDetails'
 import AdminReports from '../pages/AdminDashboard/reports/Reports'
 
 
+const AdminRoute = ({ children }) => {
+  const user = getCurrentUser()
+  return user?.role === 'admin' ? children : <Navigate to="/" replace />
+}
+
 const AppRouter = () => {
   return (
     <BrowserRouter>
@@ -44,7 +50,9 @@ const AppRouter = () => {
         <Route path="/tickets-history" element={<TicketsHistory />} />
 
         {/* ─── Movies ─── */}
-        <Route path="/movies" element={<CurrentMovies />} />
+        <Route path="/movies" element={<MovieLibrary />} />
+        <Route path="/cinemas" element={<CurrentMovies />} />
+        <Route path="/now-playing" element={<CurrentMovies />} />
         <Route path="/movies/:id" element={<MovieDetails />} />
         <Route path="/movies/:id/slots" element={<MovieSlots />} />
         <Route path="/library" element={<MovieLibrary />} />
@@ -61,10 +69,10 @@ const AppRouter = () => {
         <Route path="/browse-followers" element={<BrowseFollowers />} />
 
         {/* ─── Admin ─── */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/users/:id" element={<AdminUserDetails />} />
-        <Route path="/admin/reports" element={<AdminReports />} />
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+        <Route path="/admin/users/:id" element={<AdminRoute><AdminUserDetails /></AdminRoute>} />
+        <Route path="/admin/reports" element={<AdminRoute><AdminReports /></AdminRoute>} />
 
         <Route path="/booking" element={<Booking />} />
 

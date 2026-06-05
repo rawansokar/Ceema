@@ -74,7 +74,7 @@ const CurrentMovies = () => {
             genre: Array.isArray(featuredMovieData.genre)
               ? featuredMovieData.genre
               : featuredMovieData.genre
-                ? featuredMovieData.genre.split(',').map((g) => g.trim())
+                ? String(featuredMovieData.genre).split(',').map((g) => g.trim())
                 : []
           })
         }

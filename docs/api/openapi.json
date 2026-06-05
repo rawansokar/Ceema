@@ -1711,6 +1711,77 @@
                 }
             }
         },
+        "/api/comments/{id}/": {
+            "get": {
+                "operationId": "comments_retrieve",
+                "summary": "Get a comment",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this comment.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "comments_destroy",
+                "summary": "Delete your comment or moderate it as admin",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this comment.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
         "/api/courses/": {
             "get": {
                 "operationId": "courses_list",
@@ -3905,8 +3976,7 @@
                                 "$ref": "#/components/schemas/Post"
                             }
                         }
-                    },
-                    "required": true
+                    }
                 },
                 "security": [
                     {
@@ -4004,8 +4074,7 @@
                                 "$ref": "#/components/schemas/Post"
                             }
                         }
-                    },
-                    "required": true
+                    }
                 },
                 "security": [
                     {
@@ -4721,7 +4790,8 @@
                     },
                     {
                         "BearerAuth": []
-                    }
+                    },
+                    {}
                 ],
                 "responses": {
                     "200": {
@@ -4764,7 +4834,8 @@
                     },
                     {
                         "BearerAuth": []
-                    }
+                    },
+                    {}
                 ],
                 "responses": {
                     "200": {
@@ -6225,6 +6296,11 @@
                     "name"
                 ]
             },
+            "BlankEnum": {
+                "enum": [
+                    ""
+                ]
+            },
             "Booking": {
                 "type": "object",
                 "properties": {
@@ -6469,12 +6545,17 @@
                     "enrolled_count": {
                         "type": "integer",
                         "readOnly": true
+                    },
+                    "is_enrolled": {
+                        "type": "boolean",
+                        "readOnly": true
                     }
                 },
                 "required": [
                     "description",
                     "enrolled_count",
                     "id",
+                    "is_enrolled",
                     "title"
                 ]
             },
@@ -6571,6 +6652,14 @@
                 "required": [
                     "detail"
                 ]
+            },
+            "MediaTypeEnum": {
+                "enum": [
+                    "image",
+                    "video"
+                ],
+                "type": "string",
+                "description": "* `image` - Image\n* `video` - Video"
             },
             "Movie": {
                 "type": "object",
@@ -6913,6 +7002,10 @@
                     "enrolled_count": {
                         "type": "integer",
                         "readOnly": true
+                    },
+                    "is_enrolled": {
+                        "type": "boolean",
+                        "readOnly": true
                     }
                 }
             },
@@ -7189,14 +7282,39 @@
                         "type": "string",
                         "readOnly": true
                     },
+                    "user_avatar": {
+                        "type": "string",
+                        "readOnly": true
+                    },
                     "content": {
                         "type": "string"
+                    },
+                    "media_url": {
+                        "type": "string"
+                    },
+                    "media_type": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/MediaTypeEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
                     },
                     "original_post": {
                         "type": "integer",
                         "nullable": true
                     },
                     "original_post_content": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "original_post_media_url": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "original_post_media_type": {
                         "type": "string",
                         "readOnly": true
                     },
@@ -7211,6 +7329,10 @@
                     },
                     "comments_count": {
                         "type": "integer",
+                        "readOnly": true
+                    },
+                    "is_liked": {
+                        "type": "boolean",
                         "readOnly": true
                     }
                 }
@@ -7436,6 +7558,10 @@
                     "following_count": {
                         "type": "integer",
                         "readOnly": true
+                    },
+                    "likes_count": {
+                        "type": "integer",
+                        "readOnly": true
                     }
                 }
             },
@@ -7605,14 +7731,39 @@
                         "type": "string",
                         "readOnly": true
                     },
+                    "user_avatar": {
+                        "type": "string",
+                        "readOnly": true
+                    },
                     "content": {
                         "type": "string"
+                    },
+                    "media_url": {
+                        "type": "string"
+                    },
+                    "media_type": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/MediaTypeEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
                     },
                     "original_post": {
                         "type": "integer",
                         "nullable": true
                     },
                     "original_post_content": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "original_post_media_url": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "original_post_media_type": {
                         "type": "string",
                         "readOnly": true
                     },
@@ -7628,16 +7779,23 @@
                     "comments_count": {
                         "type": "integer",
                         "readOnly": true
+                    },
+                    "is_liked": {
+                        "type": "boolean",
+                        "readOnly": true
                     }
                 },
                 "required": [
                     "comments_count",
-                    "content",
                     "created_at",
                     "id",
+                    "is_liked",
                     "likes_count",
                     "original_post_content",
+                    "original_post_media_type",
+                    "original_post_media_url",
                     "user",
+                    "user_avatar",
                     "user_name"
                 ]
             },
@@ -7663,9 +7821,7 @@
                         "type": "string"
                     },
                     "avatar_url": {
-                        "type": "string",
-                        "format": "uri",
-                        "maxLength": 200
+                        "type": "string"
                     },
                     "portfolio": {},
                     "followers_count": {
@@ -8199,6 +8355,10 @@
                     "following_count": {
                         "type": "integer",
                         "readOnly": true
+                    },
+                    "likes_count": {
+                        "type": "integer",
+                        "readOnly": true
                     }
                 },
                 "required": [
@@ -8207,6 +8367,7 @@
                     "followers_count",
                     "following_count",
                     "id",
+                    "likes_count",
                     "name",
                     "profile"
                 ]

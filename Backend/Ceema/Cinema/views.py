@@ -2,12 +2,12 @@ import logging
 import uuid
 
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db.models import Q
+from django.db.models import BooleanField, Count, Exists, OuterRef, Q, Value
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiResponse, inline_serializer
-from rest_framework import generics, serializers as drf_serializers, status, viewsets
+from rest_framework import generics, mixins, serializers as drf_serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -724,9 +724,28 @@ class TicketViewSet(viewsets.ReadOnlyModelViewSet):
 )
 @extend_schema(tags=["posts"])
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all().order_by("-created_at")
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = (
+            Post.objects.select_related("user", "user__profile", "original_post")
+            .annotate(
+                likes_count=Count("likes", distinct=True),
+                comments_count=Count("comments", distinct=True),
+            )
+            .order_by("-created_at")
+        )
+        if getattr(self, "swagger_fake_view", False):
+            return queryset.none()
+        request_user = getattr(self.request, "user", None)
+        if request_user and request_user.is_authenticated:
+            return queryset.annotate(
+                is_liked=Exists(
+                    PostLike.objects.filter(post=OuterRef("pk"), user=request_user)
+                )
+            )
+        return queryset.annotate(is_liked=Value(False, output_field=BooleanField()))
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -760,7 +779,10 @@ class PostViewSet(viewsets.ModelViewSet):
             content=content,
             original_post=original,
         )
-        return Response(PostSerializer(post).data, status=status.HTTP_201_CREATED)
+        return Response(
+            PostSerializer(post, context={"request": request}).data,
+            status=status.HTTP_201_CREATED,
+        )
 
     @extend_schema(
         methods=["GET"],
@@ -777,11 +799,36 @@ class PostViewSet(viewsets.ModelViewSet):
     def comments(self, request, pk=None):
         post = self.get_object()
         if request.method == "GET":
-            return Response(CommentSerializer(post.comments.all(), many=True).data)
+            return Response(
+                CommentSerializer(
+                    post.comments.select_related("user").order_by("created_at"),
+                    many=True,
+                ).data
+            )
         serializer = CommentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user, post=post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema_view(
+    retrieve=extend_schema(summary="Get a comment"),
+    destroy=extend_schema(summary="Delete your comment or moderate it as admin"),
+)
+@extend_schema(tags=["posts"])
+class CommentViewSet(mixins.RetrieveModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    queryset = Comment.objects.select_related("user", "post").all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsOwnerOrAdmin]
+    http_method_names = ["get", "delete", "head", "options"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if getattr(self, "swagger_fake_view", False):
+            return queryset.none()
+        if self.request.user.role == User.ROLE_ADMIN:
+            return queryset
+        return queryset.filter(user=self.request.user)
 
 
 # ---------- Courses ----------
@@ -805,16 +852,25 @@ class CourseViewSet(viewsets.ModelViewSet):
     def enroll(self, request, pk=None):
         course = self.get_object()
         if request.user in course.users.all():
-            return Response({"detail": "Already enrolled."}, status=400)
+            return Response(
+                CourseSerializer(course, context={"request": request}).data,
+                status=status.HTTP_200_OK,
+            )
         course.users.add(request.user)
-        return Response({"detail": f"Enrolled in '{course.title}'."})
+        return Response(
+            CourseSerializer(course, context={"request": request}).data,
+            status=status.HTTP_200_OK,
+        )
 
     @extend_schema(request=None, summary="Unenroll the current user from this course")
     @action(detail=True, methods=["post"], url_path="unenroll", permission_classes=[IsAuthenticated])
     def unenroll(self, request, pk=None):
         course = self.get_object()
         course.users.remove(request.user)
-        return Response({"detail": f"Unenrolled from '{course.title}'."})
+        return Response(
+            CourseSerializer(course, context={"request": request}).data,
+            status=status.HTTP_200_OK,
+        )
 
 
 @extend_schema_view(
@@ -872,7 +928,11 @@ class BadgeViewSet(viewsets.ReadOnlyModelViewSet):
 class RewardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Reward.objects.all()
     serializer_class = RewardSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     @extend_schema(request=None, summary="Redeem this reward using your points")
     @action(detail=True, methods=["post"], url_path="redeem")
@@ -1190,12 +1250,18 @@ class ChatbotViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], url_path="ask-mood-question")
     def ask_mood_question(self, request, pk=None):
         chatbot = self.get_object()
+        if chatbot.current_mood:
+            return Response(ChatbotSerializer(chatbot).data)
         question = chatbot.ask_mood_question()
-        ChatMessage.objects.create(
-            chatbot=chatbot,
+        if not chatbot.messages.filter(
             content=question,
             sender=ChatMessage.SENDER_BOT,
-        )
+        ).exists():
+            ChatMessage.objects.create(
+                chatbot=chatbot,
+                content=question,
+                sender=ChatMessage.SENDER_BOT,
+            )
         return Response(ChatbotSerializer(chatbot).data)
 
     @extend_schema(

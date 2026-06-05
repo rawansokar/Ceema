@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { FaFilm, FaTicketAlt, FaVideo, FaGift, FaStar, FaCoffee } from 'react-icons/fa'
+import { FaFilm, FaTicketAlt, FaVideo, FaGift, FaStar } from 'react-icons/fa'
+import { GiPopcorn } from 'react-icons/gi'
 
 import Layout from '../../components/Layout/Layout'
 import { getCurrentUser } from '../../services/authService'
 import { getAllRewards, redeemReward } from '../../services/rewardsService'
 import styles from './PointsRewards.module.css'
 
-const ICONS = [FaCoffee, FaTicketAlt, FaVideo, FaStar, FaFilm, FaGift]
+const ICONS = [GiPopcorn, FaTicketAlt, FaVideo, FaStar, FaFilm, FaGift]
 
 const PointsRewards = () => {
   const [rewards, setRewards] = useState([])

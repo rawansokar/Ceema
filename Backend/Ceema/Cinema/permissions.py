@@ -13,11 +13,11 @@ class IsAdmin(BasePermission):
 
 
 class IsAdminOrReadOnly(BasePermission):
-    """Read access for everyone authenticated; write access for admins only."""
+    """Public read access; write access for admins only."""
 
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
-            return bool(request.user and request.user.is_authenticated)
+            return True
         return bool(
             request.user
             and request.user.is_authenticated

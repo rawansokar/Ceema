@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom'
+import Layout from '../../components/Layout/Layout'
 import styles from './AdminDashboard.module.css'
 
 const AdminDashboard = () => {
   const navigate = useNavigate() // ✅ MUST be inside component
 
   return (
+    <Layout showBack>
     <div className={styles.container}>
       <h1 className={styles.title}>Admin Dashboard</h1>
 
@@ -38,6 +40,7 @@ const AdminDashboard = () => {
 
       </div>
     </div>
+    </Layout>
   )
 }
 

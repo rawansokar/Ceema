@@ -3,7 +3,6 @@ import { IoChatbubbleEllipses, IoClose, IoSend } from 'react-icons/io5'
 import { MdMovieFilter } from 'react-icons/md'
 import {
   createChatbot,
-  askMoodQuestion,
   receiveAnswer,
   recommendMovies
 } from '../../services/chatbotService'
@@ -52,7 +51,7 @@ const Chatbot = () => {
         const mapped = session.messages.map((m) => ({
           id: m.id,
           text: m.content,
-          sender: m.sender === 'guest' ? 'user' : 'bot',
+          sender: ['user', 'guest'].includes(m.sender) ? 'user' : 'bot',
           time: new Date(m.timestamp).toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit'
@@ -114,18 +113,10 @@ const Chatbot = () => {
         const answerRes = await receiveAnswer(chatbotId, userText)
 
         // Get bot reply from messages
-        const botMessages = answerRes.messages.filter((m) => m.sender !== 'guest')
+        const botMessages = answerRes.messages.filter((m) => !['user', 'guest'].includes(m.sender))
         if (botMessages.length > 0) {
           const lastBotMsg = botMessages[botMessages.length - 1]
           addBotMessage(lastBotMsg.content)
-        }
-
-        // Ask next mood question
-        const moodRes = await askMoodQuestion(chatbotId, answerRes.current_mood, answerRes.last_question)
-        const moodBotMsgs = moodRes.messages.filter((m) => m.sender !== 'guest')
-        if (moodBotMsgs.length > 0) {
-          const lastMoodMsg = moodBotMsgs[moodBotMsgs.length - 1]
-          setTimeout(() => addBotMessage(lastMoodMsg.content), 800)
         }
       } else {
         // ── Dummy Mode ──
@@ -155,8 +146,11 @@ const Chatbot = () => {
     try {
       if (apiReady && chatbotId) {
         const res = await recommendMovies(chatbotId)
-        const botMsgs = res.messages.filter((m) => m.sender !== 'guest')
-        if (botMsgs.length > 0) {
+        if (Array.isArray(res) && res.length > 0) {
+          const titles = res.slice(0, 4).map((movie) => movie.title).join(', ')
+          setTimeout(() => addBotMessage(`Based on your mood, try: ${titles}.`), 800)
+        } else if (res.messages?.length > 0) {
+          const botMsgs = res.messages.filter((m) => !['user', 'guest'].includes(m.sender))
           const lastMsg = botMsgs[botMsgs.length - 1]
           setTimeout(() => addBotMessage(lastMsg.content), 800)
         } else {

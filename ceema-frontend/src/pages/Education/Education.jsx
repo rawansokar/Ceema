@@ -18,6 +18,7 @@ const Education = () => {
       const data = await getAllCourses()
       setCourses(data)
       setFiltered(data)
+      setEnrolledIds(data.filter((course) => course.is_enrolled).map((course) => course.id))
       setLoading(false)
     }
 
@@ -25,6 +26,13 @@ const Education = () => {
   }, [])
 
   // ─── ENROLL / UNENROLL ───
+  const syncCourse = (updatedCourse) => {
+    const applyUpdate = (list) =>
+      list.map((course) => course.id === updatedCourse.id ? updatedCourse : course)
+    setCourses(applyUpdate)
+    setFiltered(applyUpdate)
+  }
+
   const handleEnroll = async (courseId) => {
     const isEnrolled = enrolledIds.includes(courseId)
 
@@ -33,26 +41,14 @@ const Education = () => {
 
       if (res.success) {
         setEnrolledIds((prev) => prev.filter((id) => id !== courseId))
-        setCourses((prev) =>
-          prev.map((course) =>
-            course.id === courseId
-              ? { ...course, enrolled_count: Math.max(0, (course.enrolled_count || 0) - 1) }
-              : course
-          )
-        )
+        syncCourse(res.course)
       }
     } else {
       const res = await enrollCourse(courseId)
 
       if (res.success) {
-        setEnrolledIds((prev) => [...prev, courseId])
-        setCourses((prev) =>
-          prev.map((course) =>
-            course.id === courseId
-              ? { ...course, enrolled_count: (course.enrolled_count || 0) + 1 }
-              : course
-          )
-        )
+        setEnrolledIds((prev) => prev.includes(courseId) ? prev : [...prev, courseId])
+        syncCourse(res.course)
       }
     }
   }

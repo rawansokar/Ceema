@@ -61,6 +61,10 @@ class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
     following_count = serializers.IntegerField(source="following_links.count", read_only=True)
     followers_count = serializers.IntegerField(source="follower_links.count", read_only=True)
+    likes_count = serializers.SerializerMethodField()
+
+    def get_likes_count(self, obj) -> int:
+        return PostLike.objects.filter(post__user=obj).count()
 
     class Meta:
         model = User
@@ -78,6 +82,7 @@ class UserSerializer(serializers.ModelSerializer):
             "profile",
             "followers_count",
             "following_count",
+            "likes_count",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
@@ -342,11 +347,53 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source="user.name", read_only=True)
-    likes_count = serializers.IntegerField(source="likes.count", read_only=True)
-    comments_count = serializers.IntegerField(source="comments.count", read_only=True)
+    user_avatar = serializers.CharField(source="user.profile.avatar_url", read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
     original_post_content = serializers.CharField(
         source="original_post.content", read_only=True
     )
+    original_post_media_url = serializers.CharField(
+        source="original_post.media_url", read_only=True
+    )
+    original_post_media_type = serializers.CharField(
+        source="original_post.media_type", read_only=True
+    )
+    is_liked = serializers.SerializerMethodField()
+
+    def get_likes_count(self, obj) -> int:
+        annotated = getattr(obj, "likes_count", None)
+        if annotated is not None:
+            return annotated
+        return obj.likes.count()
+
+    def get_comments_count(self, obj) -> int:
+        annotated = getattr(obj, "comments_count", None)
+        if annotated is not None:
+            return annotated
+        return obj.comments.count()
+
+    def get_is_liked(self, obj) -> bool:
+        annotated = getattr(obj, "is_liked", None)
+        if annotated is not None:
+            return bool(annotated)
+        request = self.context.get("request")
+        return bool(
+            request
+            and request.user
+            and request.user.is_authenticated
+            and obj.likes.filter(user=request.user).exists()
+        )
+
+    def validate(self, attrs):
+        content = attrs.get("content", getattr(self.instance, "content", ""))
+        media_url = attrs.get("media_url", getattr(self.instance, "media_url", ""))
+        media_type = attrs.get("media_type", getattr(self.instance, "media_type", ""))
+        if not str(content).strip() and not media_url:
+            raise serializers.ValidationError("A post needs text, an image, or a video.")
+        if media_url and media_type not in {"image", "video"}:
+            raise serializers.ValidationError({"media_type": "Select image or video."})
+        return attrs
 
     class Meta:
         model = Post
@@ -354,12 +401,18 @@ class PostSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "user_name",
+            "user_avatar",
             "content",
+            "media_url",
+            "media_type",
             "original_post",
             "original_post_content",
+            "original_post_media_url",
+            "original_post_media_type",
             "created_at",
             "likes_count",
             "comments_count",
+            "is_liked",
         ]
         extra_kwargs = {"user": {"read_only": True}}
 
@@ -368,10 +421,20 @@ class PostSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     enrolled_count = serializers.IntegerField(source="users.count", read_only=True)
+    is_enrolled = serializers.SerializerMethodField()
+
+    def get_is_enrolled(self, obj) -> bool:
+        request = self.context.get("request")
+        return bool(
+            request
+            and request.user
+            and request.user.is_authenticated
+            and obj.users.filter(id=request.user.id).exists()
+        )
 
     class Meta:
         model = Course
-        fields = ["id", "title", "description", "url", "enrolled_count"]
+        fields = ["id", "title", "description", "url", "enrolled_count", "is_enrolled"]
 
 
 # ---------- Badge & Reward ----------

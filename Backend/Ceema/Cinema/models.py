@@ -58,7 +58,7 @@ class Admin(User):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
-    avatar_url = models.URLField(blank=True)
+    avatar_url = models.TextField(blank=True)
     portfolio = models.JSONField(default=list, blank=True)
     followers_count = models.PositiveIntegerField(default=0)
 
@@ -282,7 +282,13 @@ class Review(models.Model):
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
-    content = models.TextField()
+    content = models.TextField(blank=True)
+    media_url = models.TextField(blank=True)
+    media_type = models.CharField(
+        max_length=20,
+        blank=True,
+        choices=[("image", "Image"), ("video", "Video")],
+    )
     original_post = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,

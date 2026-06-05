@@ -113,7 +113,7 @@ const Landing = () => {
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Movies Now Playing</h2>
 
-              <Link to="/movies" className={styles.viewAllBtn}>
+              <Link to="/cinemas" className={styles.viewAllBtn}>
                 View All <FaArrowRight />
               </Link>
             </div>

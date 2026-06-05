@@ -59,6 +59,15 @@ const MovieDetails = () => {
 
   if (!movie) return null
 
+  const genres = Array.isArray(movie.genre)
+    ? movie.genre
+    : movie.genre
+      ? String(movie.genre).split(',').map((g) => g.trim()).filter(Boolean)
+      : []
+  const poster = movie.poster || movie.poster_url || movie.image_url
+  const backdrop = movie.backdrop || movie.backdrop_url || movie.wide_poster_url || poster
+  const canBook = movie.is_in_cinemas || movie.is_now_playing
+
   return (
     <Layout showBack={true}>
       <div className={styles.detailsPage}>
@@ -66,7 +75,7 @@ const MovieDetails = () => {
         {/* ───────────────── BACKDROP ───────────────── */}
         <div className={styles.backdrop}>
           <img
-            src={movie.image_url}
+            src={backdrop}
             alt={movie.title}
             className={styles.backdropImg}
           />
@@ -82,7 +91,7 @@ const MovieDetails = () => {
             {/* Poster */}
             <div className={styles.posterBlock}>
               <img
-                src={movie.image_url}
+                src={poster}
                 alt={movie.title}
                 className={styles.poster}
               />
@@ -108,7 +117,7 @@ const MovieDetails = () => {
 
                 <span className={styles.metaTag}>
                   <FaFilm />
-                  {movie.genre}
+                  {genres.join(', ')}
                 </span>
 
                 <span className={styles.ratingTag}>
@@ -119,16 +128,14 @@ const MovieDetails = () => {
               </div>
 
               {/* Genres */}
-              {movie.genre && (
+              {genres.length > 0 && (
                 <div className={styles.genreRow}>
-                  {movie.genre
-                    .split(',')
-                    .map((g) => (
+                  {genres.map((g) => (
                       <span
                         key={g}
                         className={styles.genreTag}
                       >
-                        {g.trim()}
+                        {g}
                       </span>
                     ))}
                 </div>
@@ -142,12 +149,18 @@ const MovieDetails = () => {
               {/* Actions */}
               <div className={styles.actions}>
 
-                <Link
-                  to={`/movies/${movie.id}/slots`}
-                  className={styles.bookBtn}
-                >
-                  Book Tickets
-                </Link>
+                {canBook ? (
+                  <Link
+                    to={`/movies/${movie.id}/slots`}
+                    className={styles.bookBtn}
+                  >
+                    Book Tickets
+                  </Link>
+                ) : (
+                  <span className={styles.bookBtn}>
+                    Not Showing Now
+                  </span>
+                )}
 
 
               </div>
@@ -215,7 +228,7 @@ const MovieDetails = () => {
                       </span>
 
                       <span className={styles.detailVal}>
-                        {movie.genre}
+                        {genres.join(', ')}
                       </span>
                     </div>
 

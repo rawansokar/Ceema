@@ -253,6 +253,7 @@ class CinemaAppTests(TestCase):
             f"/api/users/{self.user.id}/profile/",
             {
                 "bio": "Updated filmmaker bio",
+                "avatar_url": "data:image/png;base64,avatar",
                 "portfolio": ["data:image/png;base64,abc"],
             },
             format="json",
@@ -260,7 +261,104 @@ class CinemaAppTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["bio"], "Updated filmmaker bio")
+        self.assertEqual(response.json()["avatar_url"], "data:image/png;base64,avatar")
         self.assertEqual(response.json()["portfolio"], ["data:image/png;base64,abc"])
+
+    def test_community_comments_likes_video_and_profile_stats(self):
+        api_client = APIClient()
+        api_client.force_authenticate(user=self.user)
+        other = User.objects.create(
+            name="Other User",
+            email="other@example.com",
+            password="secret123",
+        )
+        Profile.objects.create(user=other)
+        post = Post.objects.create(
+            user=self.user,
+            content="Short film draft.",
+            media_url="data:video/mp4;base64,AAAA",
+            media_type="video",
+        )
+        Comment.objects.create(user=other, post=post, content="Great cut.")
+
+        comments_response = self.client.get(f"/api/posts/{post.id}/comments/")
+        like_response = api_client.post(f"/api/posts/{post.id}/like/")
+        unlike_response = api_client.post(f"/api/posts/{post.id}/like/")
+        own_comment_response = api_client.post(
+            f"/api/posts/{post.id}/comments/",
+            {"content": "Thanks for watching."},
+            format="json",
+        )
+        delete_response = api_client.delete(
+            f"/api/comments/{own_comment_response.json()['id']}/"
+        )
+        user_response = api_client.get(f"/api/users/{self.user.id}/")
+        post_response = self.client.get(f"/api/posts/{post.id}/")
+
+        self.assertEqual(comments_response.status_code, 200)
+        self.assertEqual(len(comments_response.json()), 1)
+        self.assertEqual(like_response.json()["liked"], True)
+        self.assertEqual(unlike_response.json()["liked"], False)
+        self.assertEqual(own_comment_response.status_code, 201)
+        self.assertEqual(delete_response.status_code, 204)
+        self.assertEqual(user_response.json()["likes_count"], 0)
+        self.assertEqual(post_response.json()["media_type"], "video")
+
+    def test_profile_counts_followers_following_and_likes(self):
+        other = User.objects.create(
+            name="Other User",
+            email="likes@example.com",
+            password="secret123",
+        )
+        Profile.objects.create(user=other)
+        post = Post.objects.create(user=self.user, content="Count this like.")
+        PostLike.objects.create(user=other, post=post)
+        Follow.objects.create(follower=other, following=self.user)
+
+        api_client = APIClient()
+        api_client.force_authenticate(user=self.user)
+        response = api_client.get(f"/api/users/{self.user.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["likes_count"], 1)
+        self.assertEqual(response.json()["followers_count"], 1)
+        self.assertEqual(response.json()["following_count"], 0)
+
+    def test_course_enrollment_returns_real_state_and_count(self):
+        other = User.objects.create(
+            name="Learner",
+            email="learner@example.com",
+            password="secret123",
+        )
+        Profile.objects.create(user=other)
+        api_client = APIClient()
+        api_client.force_authenticate(user=other)
+
+        list_response = api_client.get("/api/courses/")
+        enroll_response = api_client.post(f"/api/courses/{self.course.id}/enroll/")
+        unenroll_response = api_client.post(f"/api/courses/{self.course.id}/unenroll/")
+
+        self.assertEqual(list_response.status_code, 200)
+        self.assertFalse(list_response.json()[0]["is_enrolled"])
+        self.assertEqual(enroll_response.status_code, 200)
+        self.assertTrue(enroll_response.json()["is_enrolled"])
+        self.assertEqual(unenroll_response.status_code, 200)
+        self.assertFalse(unenroll_response.json()["is_enrolled"])
+
+    def test_admin_endpoints_are_role_gated(self):
+        user_client = APIClient()
+        admin_client = APIClient()
+        user_client.force_authenticate(user=self.user)
+        admin_client.force_authenticate(user=self.admin)
+
+        user_response = user_client.get("/api/admin/users/")
+        admin_response = admin_client.get("/api/admin/users/")
+        stats_response = admin_client.get("/api/admin/users/statistics/")
+
+        self.assertEqual(user_response.status_code, 403)
+        self.assertEqual(admin_response.status_code, 200)
+        self.assertEqual(stats_response.status_code, 200)
+        self.assertGreaterEqual(stats_response.json()["users"], 2)
 
     def test_admin_can_post_news_article(self):
         api_client = APIClient()

@@ -511,6 +511,61 @@
   margin-top:14px;
 }
 
+.postVideo {
+  width: 100%;
+  max-height: 480px;
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  background: #000;
+}
+
+.mediaPreview {
+  position: relative;
+}
+
+.removeMediaBtn {
+  margin-top: var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.mediaHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.singleComment {
+  position: relative;
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+}
+
+.singleComment p {
+  margin: 4px 32px 0 0;
+}
+
+.deleteCommentBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.deleteCommentBtn:hover {
+  color: var(--color-primary);
+}
+
 .imageInput{
   margin-top:12px;
   color:white;

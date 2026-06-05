@@ -66,7 +66,7 @@ const Login = () => {
 
     if (result.success) {
       toast.success(`Welcome back, ${result.user.name}`)
-      navigate('/')
+      navigate(result.user.role === 'admin' ? '/admin' : '/')
     } else {
       toast.error(result.message)
       setErrors({ general: result.message })

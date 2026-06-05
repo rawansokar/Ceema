@@ -35,7 +35,7 @@ const Booking = () => {
   const [hoveredId, setHoveredId] = useState(null)
 
   const handleSelectCinema = (cinema) => {
-    navigate('/movies', {
+    navigate('/cinemas', {
       state: {
         selectedCinema: cinema,
       },

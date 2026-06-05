@@ -17,7 +17,7 @@ export const normalizeMovie = (movie) => ({
   genre: Array.isArray(movie.genre)
     ? movie.genre
     : movie.genre
-      ? movie.genre.split(",").map((g) => g.trim())
+      ? String(movie.genre).split(",").map((g) => g.trim())
       : [],
 });
 

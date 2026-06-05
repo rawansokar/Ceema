@@ -53,7 +53,7 @@ const Seats = () => {
         const seats = bookingContext.showtimeId
           ? await getSeats(bookingContext.showtimeId)
           : await getAllSeats()
-        if (seats && seats.length > 50) {
+        if (seats && seats.length > 0) {
           const seatMap = buildSeatMap(
             seats.map((seat) => ({
               ...seat,
@@ -62,14 +62,14 @@ const Seats = () => {
             }))
           )
           setRows(seatMap)
-        } else {
-          // Fallback: generate seat map matching screenshot layout
-          // 13 rows: A-H standard (rows 1-8), I-M VIP (rows 9-13)
+        } else if (!bookingContext.showtimeId) {
           setRows(generateFallbackSeats())
+        } else {
+          setRows([])
         }
       } catch (err) {
         console.error('Failed to fetch seats:', err)
-        setRows(generateFallbackSeats())
+        setRows(bookingContext.showtimeId ? [] : generateFallbackSeats())
       } finally {
         setLoading(false)
       }
@@ -237,7 +237,11 @@ const Seats = () => {
           </div>
 
           {/* ─── Seat Map ─── */}
-          <div className={styles.seatMap}>
+          {rows.length === 0 ? (
+            <div className={styles.emptySeats}>
+              No seats are configured for this showtime. Please select another showtime.
+            </div>
+          ) : <div className={styles.seatMap}>
             {rows.map((row) => (
               <div key={row.rowId} className={styles.seatRow}>
                 <span className={styles.rowLabel}>{row.rowId}</span>
@@ -255,7 +259,7 @@ const Seats = () => {
                 <span className={styles.rowLabel}>{row.rowId}</span>
               </div>
             ))}
-          </div>
+          </div>}
 
           {/* ─── Selected Summary ─── */}
           {selectedSeats.length > 0 && (
