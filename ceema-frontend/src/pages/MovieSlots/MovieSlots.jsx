@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -9,6 +9,13 @@ import styles from './MovieSlots.module.css'
 
 import { getMovieById, getAllShowtimes } from '../../services/movieService'
 import { getCinemas } from '../../services/bookingService'
+
+const normalizeCinemaName = (value = '') =>
+  String(value)
+    .toLowerCase()
+    .replace(/cinemas?/g, 'cinema')
+    .replace(/\s+/g, ' ')
+    .trim()
 
 const MovieSlots = () => {
   const navigate = useNavigate()
@@ -36,17 +43,43 @@ const MovieSlots = () => {
       setMovie(movieData)
       setCinemas(cinemasData)
 
-      setShowtimes(allShowtimes.filter((s) => s.movie === Number(id)))
+      setShowtimes(allShowtimes.filter((s) => Number(s.movie) === Number(id)))
     }
 
     fetchData()
   }, [id, navigate])
 
-  const visibleShowtimes = selectedCinema
+  const cinemaOptions = useMemo(() => {
+    const options = new Map()
+
+    showtimes.forEach((showtime) => {
+      const name = showtime.cinema_name || showtime.cinema || showtime.hall || 'CEEMA Cinema'
+      const key = `${normalizeCinemaName(name)}-${showtime.city || ''}`
+      if (!options.has(key)) {
+        options.set(key, {
+          id: key,
+          name,
+          city: showtime.city || '',
+          location: showtime.city || '',
+          showtimeCount: 0,
+        })
+      }
+      options.get(key).showtimeCount += 1
+    })
+
+    return options.size ? Array.from(options.values()) : cinemas
+  }, [cinemas, showtimes])
+
+  const activeCinema =
+    cinemaOptions.find((cinema) => cinema.id === selectedCinema?.id) ||
+    cinemaOptions[0] ||
+    null
+
+  const visibleShowtimes = activeCinema
     ? showtimes.filter((showtime) => {
         const cinemaName = showtime.cinema_name || showtime.cinema || showtime.hall || ''
-        const sameCinema = cinemaName === selectedCinema.name
-        const sameCity = !selectedCinema.city || showtime.city === selectedCinema.city
+        const sameCinema = normalizeCinemaName(cinemaName) === normalizeCinemaName(activeCinema.name)
+        const sameCity = !activeCinema.city || showtime.city === activeCinema.city
         return sameCinema && sameCity
       })
     : []
@@ -65,7 +98,7 @@ const MovieSlots = () => {
   }
 
   const handleContinue = () => {
-    if (!selectedCinema) {
+    if (!activeCinema) {
       toast.error('Please select a cinema')
       return
     }
@@ -79,7 +112,7 @@ const MovieSlots = () => {
       state: {
         movieId: movie.id,
         movie: movie.title,
-        cinema: selectedCinema.name,
+        cinema: activeCinema.name,
         showtimeId: selectedShowtimes[0].id,
         showtime: `${selectedShowtimes[0].date} ${selectedShowtimes[0].time}`,
         ticketPrice: Number(selectedShowtimes[0].ticket_price || 200),
@@ -123,11 +156,11 @@ const MovieSlots = () => {
             </h2>
 
             <div className={styles.showtimesGrid}>
-              {cinemas.map((c) => (
+              {cinemaOptions.map((c) => (
                 <button
                   key={c.id}
                   className={`${styles.showtimeBtn} ${
-                    selectedCinema?.id === c.id
+                    activeCinema?.id === c.id
                       ? styles.showtimeActive
                       : ''
                   }`}
@@ -137,6 +170,7 @@ const MovieSlots = () => {
                   }}
                 >
                   <strong>{c.name}</strong>
+                  {c.showtimeCount ? <small>{c.showtimeCount} slot{c.showtimeCount === 1 ? '' : 's'}</small> : null}
                 </button>
               ))}
             </div>
@@ -150,10 +184,10 @@ const MovieSlots = () => {
             </h2>
 
             <div className={styles.showtimesGrid}>
-              {!selectedCinema ? (
+              {!activeCinema ? (
                 <p>Please select a cinema first</p>
               ) : visibleShowtimes.length === 0 ? (
-                <p>No showtimes available now</p>
+                <p>No showtimes available for this cinema. Please choose another cinema.</p>
               ) : (
                 visibleShowtimes.map((s) => {
                   const isSelected = selectedShowtimes.some(
@@ -181,10 +215,10 @@ const MovieSlots = () => {
           </div>
 
           {/* SUMMARY */}
-          {selectedCinema && selectedShowtimes.length > 0 && (
+          {activeCinema && selectedShowtimes.length > 0 && (
             <div className={styles.selectionSummary}>
               <FaFilm style={{ marginRight: '6px' }} />
-              {movie.title} · {selectedCinema.name} ·{' '}
+              {movie.title} · {activeCinema.name} ·{' '}
               {selectedShowtimes.length} showtime(s) selected
             </div>
           )}
@@ -193,7 +227,7 @@ const MovieSlots = () => {
           <button
             className={styles.continueBtn}
             onClick={handleContinue}
-            disabled={!selectedCinema || selectedShowtimes.length === 0}
+            disabled={!activeCinema || selectedShowtimes.length === 0}
           >
             Select Seats →
           </button>

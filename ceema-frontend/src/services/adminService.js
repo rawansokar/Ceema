@@ -3,6 +3,53 @@
 import api from '../api/api'
 
 // =========================
+// MOVIES APIs
+// =========================
+
+export const createMovie = async (data) => {
+  const response = await api.post('/api/movies/', data)
+  return response.data
+}
+
+export const patchMovie = async (id, data) => {
+  const response = await api.patch(`/api/movies/${id}/`, data)
+  return response.data
+}
+
+export const deleteMovie = async (id) => {
+  const response = await api.delete(`/api/movies/${id}/`)
+  return response.data
+}
+
+// =========================
+// SHOWTIMES APIs
+// =========================
+
+export const createShowtime = async (data) => {
+  const response = await api.post('/api/showtimes/', data)
+  return response.data
+}
+
+export const patchShowtime = async (id, data) => {
+  const response = await api.patch(`/api/showtimes/${id}/`, data)
+  return response.data
+}
+
+export const deleteShowtime = async (id) => {
+  const response = await api.delete(`/api/showtimes/${id}/`)
+  return response.data
+}
+
+// =========================
+// POSTS APIs
+// =========================
+
+export const deleteAdminPost = async (id) => {
+  const response = await api.delete(`/api/posts/${id}/`)
+  return response.data
+}
+
+// =========================
 // USERS APIs
 // =========================
 

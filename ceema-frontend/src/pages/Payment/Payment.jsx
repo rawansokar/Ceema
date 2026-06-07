@@ -6,6 +6,7 @@ import Layout from '../../components/Layout/Layout'
 
 import { processMockPayment } from '../../services/paymentService'
 import { createBooking } from '../../services/bookingService'
+import { getCurrentUser, getUserById } from '../../services/authService'
 
 import styles from './Payment.module.css'
 
@@ -50,6 +51,16 @@ const Payment = () => {
 
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
+
+  const refreshStoredUser = async () => {
+    const currentUser = getCurrentUser()
+    if (!currentUser?.id) return null
+    const freshUser = await getUserById(currentUser.id)
+    if (freshUser) {
+      localStorage.setItem('ceema_user', JSON.stringify(freshUser))
+    }
+    return freshUser
+  }
 
   // ─── Validation ───
   const validate = () => {
@@ -191,6 +202,8 @@ const Payment = () => {
 
       let bookingId = bookingData.bookingId
 
+      let updatedUser = null
+
       if (!bookingId && bookingData.showtimeId && bookingData.seatIds?.length) {
         const bookingResult = await createBooking({
           showtimeId: bookingData.showtimeId,
@@ -206,6 +219,7 @@ const Payment = () => {
         }
 
         bookingId = bookingResult.booking.id
+        updatedUser = await refreshStoredUser()
       }
 
       const result = paymentMethod === 'cashier'
@@ -229,8 +243,11 @@ const Payment = () => {
 
       if (result.success) {
 
+        const earnedPoints = (bookingData.seatIds?.length || seats.length || 0) * 10
         toast.success(
-          'Payment successful! 🎬'
+          earnedPoints
+            ? `Booking confirmed! You earned ${earnedPoints} points.`
+            : 'Payment successful! 🎬'
         )
 
         navigate(
@@ -244,6 +261,8 @@ const Payment = () => {
               paymentMethod,
               paymentStatus: paymentMethod === 'cashier' ? 'Pay at cashier' : 'Paid',
               payment: result.data,
+              points: updatedUser?.points,
+              pointsEarned: earnedPoints,
             }
           }
         )

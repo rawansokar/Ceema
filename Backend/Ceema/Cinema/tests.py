@@ -1,5 +1,7 @@
 from datetime import date, time
+from io import StringIO
 
+from django.core.management import call_command
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from rest_framework.test import APIClient
@@ -182,6 +184,21 @@ class CinemaAppTests(TestCase):
 
         self.assertEqual(self.user.points, 25)
 
+    def test_reward_redeem_decreases_user_points(self):
+        self.user.points = 120
+        self.user.save(update_fields=["points"])
+        reward = Reward.objects.create(name="Free Popcorn", points_required=50)
+        api_client = APIClient()
+        api_client.force_authenticate(user=self.user)
+
+        response = api_client.post(f"/api/rewards/{reward.id}/redeem/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["points"], 70)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.points, 70)
+        self.assertTrue(reward.users.filter(id=self.user.id).exists())
+
     def test_booking_create_accepts_exact_total_price(self):
         api_client = APIClient()
         api_client.force_authenticate(user=self.user)
@@ -199,6 +216,51 @@ class CinemaAppTests(TestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()["total_price"], "700.00")
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.points, 10)
+
+    def test_admin_created_showtime_gets_default_seats(self):
+        api_client = APIClient()
+        api_client.force_authenticate(user=self.admin)
+
+        response = api_client.post(
+            "/api/showtimes/",
+            {
+                "movie": self.movie.id,
+                "date": "2026-06-10",
+                "time": "19:00:00",
+                "hall": "Hall B",
+                "city": "Cairo",
+                "cinema_name": "CEEMA Downtown",
+                "ticket_price": "120.00",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        showtime_id = response.json()["id"]
+        self.assertEqual(Seat.objects.filter(showtime_id=showtime_id).count(), 80)
+
+    def test_seed_future_showtimes_command_creates_showtimes_and_seats(self):
+        self.movie.is_now_playing = True
+        self.movie.is_in_cinemas = True
+        self.movie.save(update_fields=["is_now_playing", "is_in_cinemas"])
+        out = StringIO()
+
+        call_command(
+            "seed_future_showtimes",
+            start_date="2026-06-10",
+            days=2,
+            stdout=out,
+        )
+
+        generated = Showtime.objects.filter(
+            movie=self.movie,
+            date__gte="2026-06-10",
+            date__lte="2026-06-11",
+        ).exclude(id=self.showtime.id)
+        self.assertEqual(generated.count(), 2)
+        self.assertEqual(Seat.objects.filter(showtime__in=generated).count(), 160)
 
     def test_admin_helper_methods_expose_management_targets(self):
         Report.objects.create(admin=self.admin)

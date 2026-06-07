@@ -4,7 +4,7 @@ import uuid
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import BooleanField, Count, Exists, OuterRef, Q, Value
 from django.shortcuts import get_object_or_404
-from django.db import transaction
+from django.db import connection, transaction
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiResponse, inline_serializer
 from rest_framework import generics, mixins, serializers as drf_serializers, status, viewsets
@@ -23,6 +23,30 @@ def make_tokens(user):
     refresh["role"] = user.role
     refresh["email"] = user.email
     return str(refresh.access_token), str(refresh)
+
+
+def ensure_showtime_seats(showtime):
+    existing = set(
+        Seat.objects.filter(showtime=showtime).values_list("seat_number", flat=True)
+    )
+    seats = []
+    for row in range(1, 9):
+        row_letter = chr(64 + row)
+        for column in range(1, 11):
+            seat_number = f"{row_letter}{column}"
+            if seat_number in existing:
+                continue
+            seats.append(
+                Seat(
+                    showtime=showtime,
+                    seat_number=seat_number,
+                    status=Seat.STATUS_AVAILABLE,
+                    row=row,
+                    column=column,
+                )
+            )
+    if seats:
+        Seat.objects.bulk_create(seats, ignore_conflicts=True)
 
 from .models import (
     Badge, Booking, Chatbot, ChatMessage, Comment, Course, Follow,
@@ -535,10 +559,15 @@ class ShowtimeViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAdmin()]
 
+    def perform_create(self, serializer):
+        showtime = serializer.save()
+        ensure_showtime_seats(showtime)
+
     @extend_schema(summary="List all seats for this showtime (with availability status)")
     @action(detail=True, methods=["get"], permission_classes=[AllowAny])
     def seats(self, request, pk=None):
         showtime = self.get_object()
+        ensure_showtime_seats(showtime)
         seats = Seat.objects.filter(showtime=showtime)
         return Response(SeatSerializer(seats, many=True).data)
 
@@ -987,7 +1016,15 @@ class ReportViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         from .models import Admin as AdminModel
-        admin = get_object_or_404(AdminModel, id=self.request.user.id)
+        admin = AdminModel.objects.filter(id=self.request.user.id).first()
+        if not admin:
+            parent_link = AdminModel._meta.get_ancestor_link(User)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    f"INSERT INTO {AdminModel._meta.db_table} ({parent_link.column}) VALUES (%s)",
+                    [self.request.user.id],
+                )
+            admin = AdminModel.objects.get(id=self.request.user.id)
         serializer.save(admin=admin)
 
     @extend_schema(

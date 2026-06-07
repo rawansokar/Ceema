@@ -4,7 +4,7 @@ import { FaFilm, FaTicketAlt, FaVideo, FaGift, FaStar } from 'react-icons/fa'
 import { GiPopcorn } from 'react-icons/gi'
 
 import Layout from '../../components/Layout/Layout'
-import { getCurrentUser } from '../../services/authService'
+import { getCurrentUser, getUserById } from '../../services/authService'
 import { getAllRewards, redeemReward } from '../../services/rewardsService'
 import styles from './PointsRewards.module.css'
 
@@ -19,8 +19,16 @@ const PointsRewards = () => {
   useEffect(() => {
     const loadRewards = async () => {
       setLoading(true)
-      const data = await getAllRewards()
+      const currentUser = getCurrentUser()
+      const [data, freshUser] = await Promise.all([
+        getAllRewards(),
+        currentUser?.id ? getUserById(currentUser.id) : Promise.resolve(null),
+      ])
       setRewards(data)
+      if (freshUser) {
+        localStorage.setItem('ceema_user', JSON.stringify(freshUser))
+        setPoints(freshUser.points || 0)
+      }
       setLoading(false)
     }
 
